@@ -1,0 +1,1 @@
+server:  port: 8085  info:  app:    name: Stock Market Service    description:     version: 0.0.1    spring:  application:    name: Stock Market Servicemanagement:  endpoints:    web:      exposure:        include: "health,info,metrics"        exclude:         logging:  level:    root: INFO    org.package: INFO
