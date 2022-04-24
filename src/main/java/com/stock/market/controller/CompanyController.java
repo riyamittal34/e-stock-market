@@ -1,5 +1,7 @@
 package com.stock.market.controller;
 
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.stock.market.dto.CompanyResponse;
+import com.stock.market.dto.ResponseMessage;
+import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
 @Controller
@@ -27,42 +32,116 @@ public class CompanyController {
 	CompanyService companyService;
 
 	@PostMapping(value = "/register")
-	public ResponseEntity<String> registerCompany(@RequestBody String requestBody) {
+	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody String requestBody) {
 		applicationLog.info("Entering registerCompany Controller");
-
-		companyService.registerCompany(requestBody);
-
-		applicationLog.info("Exiting registerCompany Controller");
-		return new ResponseEntity<>("", HttpStatus.OK);
+		Boolean isSuccessful = false;
+		CompanyResponse<Boolean> response = new CompanyResponse<Boolean>();
+		try {
+			isSuccessful = companyService.registerCompany(requestBody);
+			response.withData(isSuccessful);
+			applicationLog.info("Exiting registerCompany Controller");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			errorLog.error("Error in Registering the company. error: [{}]", e.getMessage());
+			response.withData(false);
+			ResponseMessage message = new ResponseMessage();
+			message.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
+			message.setDescription("Error in Registering the company");
+			response.withMessage(message);
+			applicationLog.info("Exiting registerCompany Controller");
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@GetMapping(value = "/info/{companycode}")
-	public ResponseEntity<String> getCompanyByCompanyCode(@PathVariable("companycode") String companyCode) {
+	public ResponseEntity<CompanyResponse<CompanyDao>> getCompanyByCompanyCode(
+			@PathVariable("companycode") String companyCode) {
 		applicationLog.info("Entering getCompanyByCompanyCode Controller");
-
-		companyService.getCompanyByCompanyCode(companyCode);
-
-		applicationLog.info("Entering getCompanyByCompanyCode Controller");
-		return new ResponseEntity<>("", HttpStatus.OK);
+		CompanyDao company = null;
+		CompanyResponse<CompanyDao> response = new CompanyResponse<CompanyDao>();
+		ResponseMessage message = new ResponseMessage();
+		try {
+			company = companyService.getCompanyByCompanyCode(companyCode);
+			applicationLog.info("Entering getCompanyByCompanyCode Controller");
+			if (company == null) {
+				message.setCode("COMPANY_NOT_FOUND");
+				message.setDescription("No company found with company code: " + companyCode);
+				response.withData(company);
+				response.withMessage(message);
+				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+			} else {
+				message.setCode("COMANY_FOUND");
+				message.setDescription("Company found with the company code: " + companyCode);
+				response.withData(company);
+				response.withMessage(message);
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			errorLog.error("Error in fetching company details for company code: {}, error: {}", companyCode,
+					e.getMessage());
+			message.setCode("INTERNAL_SERVER_ERROR");
+			message.setDescription("Error in fetching company with company code: " + companyCode);
+			response.withData(company);
+			response.withMessage(message);
+			applicationLog.info("Entering getCompanyByCompanyCode Controller");
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@GetMapping(value = "/getall")
-	public ResponseEntity<String> getAllCompanyDetails() {
+	public ResponseEntity<CompanyResponse<List<CompanyDao>>> getAllCompanyDetails() {
 		applicationLog.info("Entering getAllCompanyDetails Controller");
-
-		companyService.getAllCompanyDetails();
-
-		applicationLog.info("Entering getAllCompanyDetails Controller");
-		return new ResponseEntity<>("", HttpStatus.OK);
+		CompanyResponse<List<CompanyDao>> response = new CompanyResponse<>();
+		List<CompanyDao> companies = null;
+		ResponseMessage message = new ResponseMessage();
+		try {
+			companies = companyService.getAllCompanyDetails();
+			if (companies != null && companies.size() > 0) {
+				message.setCode("COMPANY_NOT_FOUND");
+				message.setDescription("No Company found");
+				response.withData(companies);
+				response.withMessage(message);
+				applicationLog.info("Entering getAllCompanyDetails Controller");
+				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+			} else {
+				message.setCode("ALL_COMPANY_FETCHED");
+				message.setDescription("Data for all company fetched");
+				response.withData(companies);
+				response.withMessage(message);
+				applicationLog.info("Entering getAllCompanyDetails Controller");
+				return new ResponseEntity<>(response, HttpStatus.OK);
+			}
+		} catch (Exception e) {
+			errorLog.error("Error in fetch all company details. error: [{}]", e.getMessage());
+			message.setCode("INTERNAL_SERVER_ERROR");
+			message.setDescription("Error in fetching all company data");
+			response.withData(companies);
+			response.withMessage(message);
+			applicationLog.info("Entering getAllCompanyDetails Controller");
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 
 	@DeleteMapping(value = "/delete/{companycode}")
-	public ResponseEntity<String> deleteCompanyByCompanyCode(@PathVariable("companycode") String companyCode) {
+	public ResponseEntity<CompanyResponse<Boolean>> deleteCompanyByCompanyCode(
+			@PathVariable("companycode") String companyCode) {
 		applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
-
-		companyService.deleteCompanyByCompanyCode(companyCode);
-
-		applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
-		return new ResponseEntity<>("", HttpStatus.OK);
+		CompanyResponse<Boolean> response = new CompanyResponse<>();
+		ResponseMessage message = new ResponseMessage();
+		try {
+			Boolean isSuccessful = companyService.deleteCompanyByCompanyCode(companyCode);
+			response.withData(isSuccessful);
+			applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		} catch (Exception e) {
+			errorLog.error("Error in deleting company with company code: [{}], error: [{}]", companyCode,
+					e.getMessage());
+			message.setCode("INTERNAL_SERVER_ERROR");
+			message.setDescription("Error in deleting company with company code: " + companyCode);
+			response.withData(false);
+			response.withMessage(message);
+			applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
+			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

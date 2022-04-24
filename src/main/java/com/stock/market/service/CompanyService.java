@@ -2,13 +2,15 @@ package com.stock.market.service;
 
 import java.util.List;
 
+import com.stock.market.entity.CompanyDao;
+
 public interface CompanyService {
 
-	public String registerCompany(String requestBody);
+	public Boolean registerCompany(String requestBody) throws Exception;
 
-	public String getCompanyByCompanyCode(String companyCode);
+	public CompanyDao getCompanyByCompanyCode(String companyCode) throws Exception;
 
-	public List<String> getAllCompanyDetails();
+	public List<CompanyDao> getAllCompanyDetails() throws Exception;
 
-	public String deleteCompanyByCompanyCode(String companyCode);
+	public Boolean deleteCompanyByCompanyCode(String companyCode) throws Exception;
 }
