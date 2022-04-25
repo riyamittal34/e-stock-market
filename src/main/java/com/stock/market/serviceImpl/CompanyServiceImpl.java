@@ -14,16 +14,29 @@ import com.stock.market.entity.CompanyDao;
 import com.stock.market.repository.CompanyRepository;
 import com.stock.market.service.CompanyService;
 
+/**
+ * The Class CompanyServiceImpl.
+ */
 @Service
 public class CompanyServiceImpl implements CompanyService {
 
+	/** The application log. */
 	private final Logger applicationLog = LoggerFactory.getLogger("[APPLICATION]");
 
+	/** The error log. */
 	private final Logger errorLog = LoggerFactory.getLogger("[ERROR]");
 
+	/** The company repository. */
 	@Autowired
 	CompanyRepository companyRepository;
 
+	/**
+	 * Register company.
+	 *
+	 * @param requestBody the request body
+	 * @return the boolean
+	 * @throws Exception the exception
+	 */
 	@Override
 	public Boolean registerCompany(String requestBody) throws Exception {
 		applicationLog.info("Entering registerCompany Service");
@@ -58,6 +71,13 @@ public class CompanyServiceImpl implements CompanyService {
 		return isSuccessful;
 	}
 
+	/**
+	 * Gets the company by company code.
+	 *
+	 * @param companyCode the company code
+	 * @return the company by company code
+	 * @throws Exception the exception
+	 */
 	@Override
 	public CompanyDao getCompanyByCompanyCode(String companyCode) throws Exception {
 		applicationLog.info("Entering getCompanybyCompanyCode Service");
@@ -69,6 +89,12 @@ public class CompanyServiceImpl implements CompanyService {
 		return company;
 	}
 
+	/**
+	 * Gets the all company details.
+	 *
+	 * @return the all company details
+	 * @throws Exception the exception
+	 */
 	@Override
 	public List<CompanyDao> getAllCompanyDetails() throws Exception {
 		applicationLog.info("Entering getAllCompanyDetails Service");
@@ -79,6 +105,13 @@ public class CompanyServiceImpl implements CompanyService {
 		return companies;
 	}
 
+	/**
+	 * Delete company by company code.
+	 *
+	 * @param companyCode the company code
+	 * @return the boolean
+	 * @throws Exception the exception
+	 */
 	@Override
 	public Boolean deleteCompanyByCompanyCode(String companyCode) throws Exception {
 		applicationLog.info("Entering deleteCompanyByCompanyCode Service");

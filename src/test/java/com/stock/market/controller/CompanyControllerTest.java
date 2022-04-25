@@ -24,16 +24,26 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
+/**
+ * The Class CompanyControllerTest.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 class CompanyControllerTest {
 
+	/** The mock mvc. */
 	@Autowired
 	private MockMvc mockMvc;
 
+	/** The company service. */
 	@MockBean
 	CompanyService companyService;
 
+	/**
+	 * Register company test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyTest() throws Exception {
 
@@ -45,6 +55,11 @@ class CompanyControllerTest {
 				.andReturn();
 	}
 
+	/**
+	 * Register company already exist test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyAlreadyExistTest() throws Exception {
 
@@ -56,6 +71,11 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("COMPANY_ALREADY_EXIST"))).andReturn();
 	}
 
+	/**
+	 * Register company exception test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyExceptionTest() throws Exception {
 
@@ -67,6 +87,12 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("INTERNAL_SERVER_ERROR"))).andReturn();
 	}
 
+	/**
+	 * Gets the company bycompany code test.
+	 *
+	 * @return the company bycompany code test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getCompanyBycompanyCodeTest() throws Exception {
 
@@ -81,6 +107,12 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("COMPANY_FOUND"))).andReturn();
 	}
 
+	/**
+	 * Gets the company bycompany code null data test.
+	 *
+	 * @return the company bycompany code null data test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getCompanyBycompanyCodeNullDataTest() throws Exception {
 
@@ -90,6 +122,12 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("COMPANY_NOT_FOUND"))).andReturn();
 	}
 
+	/**
+	 * Gets the company bycompany code exception test.
+	 *
+	 * @return the company bycompany code exception test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getCompanyBycompanyCodeExceptionTest() throws Exception {
 
@@ -100,6 +138,12 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("INTERNAL_SERVER_ERROR"))).andReturn();
 	}
 
+	/**
+	 * Gets the all company details test.
+	 *
+	 * @return the all company details test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getAllCompanyDetailsTest() throws Exception {
 
@@ -116,6 +160,12 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("DATA_FETCH_SUCCESS"))).andReturn();
 	}
 
+	/**
+	 * Gets the all company details null data test.
+	 *
+	 * @return the all company details null data test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getAllCompanyDetailsNullDataTest() throws Exception {
 
@@ -126,6 +176,12 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("NO_COMPANY_FOUND"))).andReturn();
 	}
 
+	/**
+	 * Gets the all company details exception test.
+	 *
+	 * @return the all company details exception test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getAllCompanyDetailsExceptionTest() throws Exception {
 		when(companyService.getAllCompanyDetails()).thenThrow(Exception.class);
@@ -135,6 +191,11 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("INTERNAL_SERVER_ERROR"))).andReturn();
 	}
 
+	/**
+	 * Delete company by company code test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void deleteCompanyByCompanyCodeTest() throws Exception {
 
@@ -144,6 +205,11 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("COMPANY_DELETED"))).andReturn();
 	}
 	
+	/**
+	 * Delete company by company code exception test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void deleteCompanyByCompanyCodeExceptionTest() throws Exception {
 

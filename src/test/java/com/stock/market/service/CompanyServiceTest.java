@@ -24,22 +24,35 @@ import com.stock.market.entity.CompanyDao;
 import com.stock.market.repository.CompanyRepository;
 import com.stock.market.serviceImpl.CompanyServiceImpl;
 
+/**
+ * The Class CompanyServiceTest.
+ */
 @SpringBootTest
 @AutoConfigureMockMvc
 public class CompanyServiceTest {
 
+	/** The company service. */
 	@InjectMocks
 	CompanyServiceImpl companyService;
 
+	/** The company repository. */
 	@Mock
 	CompanyRepository companyRepository;
 
+	/**
+	 * Sets the up.
+	 */
 	@SuppressWarnings("deprecation")
 	@BeforeEach
 	void setUp() {
 		MockitoAnnotations.initMocks(this);
 	}
 
+	/**
+	 * Register company test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyTest() throws Exception {
 
@@ -52,6 +65,11 @@ public class CompanyServiceTest {
 		assertTrue(isSuccessful);
 	}
 
+	/**
+	 * Register company mapping exception test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyMappingExceptionTest() throws Exception {
 		Assertions.assertThrows(Exception.class, () -> {
@@ -59,6 +77,11 @@ public class CompanyServiceTest {
 		});
 	}
 
+	/**
+	 * Register company already exist test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyAlreadyExistTest() throws Exception {
 
@@ -70,6 +93,11 @@ public class CompanyServiceTest {
 		assertFalse(isSuccessful);
 	}
 
+	/**
+	 * Register company save exception test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanySaveExceptionTest() throws Exception {
 
@@ -80,6 +108,12 @@ public class CompanyServiceTest {
 		});
 	}
 
+	/**
+	 * Gets the company by company code test.
+	 *
+	 * @return the company by company code test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getCompanyByCompanyCodeTest() throws Exception {
 
@@ -93,6 +127,12 @@ public class CompanyServiceTest {
 		assertEquals(company.getCompanyName(), companyDao.getCompanyName());
 	}
 
+	/**
+	 * Gets the all company details test.
+	 *
+	 * @return the all company details test
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void getAllCompanyDetailsTest() throws Exception {
 
@@ -105,6 +145,11 @@ public class CompanyServiceTest {
 		assertEquals(1, companies.size());
 	}
 
+	/**
+	 * Delete company by company code test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void deleteCompanyByCompanyCodeTest() throws Exception {
 
@@ -114,6 +159,11 @@ public class CompanyServiceTest {
 		assertTrue(isSuccess);
 	}
 
+	/**
+	 * Gets the company object.
+	 *
+	 * @return the company object
+	 */
 	private CompanyDao getCompanyObject() {
 		CompanyDao company = new CompanyDao();
 		company.setCompanyCode("abc");

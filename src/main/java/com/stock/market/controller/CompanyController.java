@@ -20,17 +20,29 @@ import com.stock.market.dto.ResponseMessage;
 import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
+/**
+ * The Class CompanyController.
+ */
 @Controller
 @RequestMapping("/api/v1.0/market/company")
 public class CompanyController {
 
+	/** The application log. */
 	private final Logger applicationLog = LoggerFactory.getLogger("[APPLICATION]");
 
+	/** The error log. */
 	private final Logger errorLog = LoggerFactory.getLogger("[ERROR]");
 
+	/** The company service. */
 	@Autowired
 	CompanyService companyService;
 
+	/**
+	 * Register company.
+	 *
+	 * @param requestBody the request body
+	 * @return the response entity
+	 */
 	@PostMapping(value = "/register")
 	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody String requestBody) {
 		applicationLog.info("Entering registerCompany Controller");
@@ -61,6 +73,12 @@ public class CompanyController {
 		}
 	}
 
+	/**
+	 * Gets the company by company code.
+	 *
+	 * @param companyCode the company code
+	 * @return the company by company code
+	 */
 	@GetMapping(value = "/info/{companycode}")
 	public ResponseEntity<CompanyResponse<CompanyDao>> getCompanyByCompanyCode(
 			@PathVariable("companycode") String companyCode) {
@@ -96,6 +114,11 @@ public class CompanyController {
 		}
 	}
 
+	/**
+	 * Gets the all company details.
+	 *
+	 * @return the all company details
+	 */
 	@GetMapping(value = "/getall")
 	public ResponseEntity<CompanyResponse<List<CompanyDao>>> getAllCompanyDetails() {
 		applicationLog.info("Entering getAllCompanyDetails Controller");
@@ -130,6 +153,12 @@ public class CompanyController {
 		}
 	}
 
+	/**
+	 * Delete company by company code.
+	 *
+	 * @param companyCode the company code
+	 * @return the response entity
+	 */
 	@DeleteMapping(value = "/delete/{companycode}")
 	public ResponseEntity<CompanyResponse<Boolean>> deleteCompanyByCompanyCode(
 			@PathVariable("companycode") String companyCode) {
