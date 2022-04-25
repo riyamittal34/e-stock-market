@@ -39,6 +39,7 @@ public class CompanyServiceImpl implements CompanyService {
 
 		CompanyDao comapanyDao = companyRepository.findByCompanyCode(companyDto.getCompanyCode());
 		if (comapanyDao != null) {
+			applicationLog.info("Company Already Exists");
 			isSuccessful = false;
 		} else {
 			CompanyDao company = new CompanyDao();
