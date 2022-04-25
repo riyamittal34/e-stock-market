@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -67,6 +68,16 @@ public class CompanyServiceTest {
 		Boolean isSuccessful = companyService
 				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
 		assertFalse(isSuccessful);
+	}
+
+	@Test
+	public void registerCompanySaveExceptionTest() throws Exception {
+
+		Assertions.assertThrows(Exception.class, () -> {
+			when(companyRepository.findByCompanyCode(anyString())).thenReturn(null);
+			when(companyRepository.save(any(CompanyDao.class))).thenThrow(Exception.class);
+			companyService.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
+		});
 	}
 
 	@Test
