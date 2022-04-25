@@ -78,7 +78,7 @@ public class CompanyController {
 				response.withMessage(message);
 				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 			} else {
-				message.setCode("COMANY_FOUND");
+				message.setCode("COMPANY_FOUND");
 				message.setDescription("Company found with the company code: " + companyCode);
 				response.withData(company);
 				response.withMessage(message);
