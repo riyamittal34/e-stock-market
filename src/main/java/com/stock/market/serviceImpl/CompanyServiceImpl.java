@@ -37,16 +37,22 @@ public class CompanyServiceImpl implements CompanyService {
 			throw e;
 		}
 
-		CompanyDao company = new CompanyDao();
-		company.setCompanyCode(companyDto.getCompanyCode());
-		company.setCompanyName(companyDto.getCompanyName());
-		try {
-			companyRepository.save(company);
-			isSuccessful = true;
-		} catch (Exception e) {
-			errorLog.error("Error in saving company details to db. error: {}", e.getMessage());
-			throw e;
+		CompanyDao comapanyDao = companyRepository.findByCompanyCode(companyDto.getCompanyCode());
+		if (comapanyDao != null) {
+			isSuccessful = false;
+		} else {
+			CompanyDao company = new CompanyDao();
+			company.setCompanyCode(companyDto.getCompanyCode());
+			company.setCompanyName(companyDto.getCompanyName());
+			try {
+				companyRepository.save(company);
+				isSuccessful = true;
+			} catch (Exception e) {
+				errorLog.error("Error in saving company details to db. error: {}", e.getMessage());
+				throw e;
+			}
 		}
+
 		applicationLog.info("Exiting registerCompany Service");
 		return isSuccessful;
 	}

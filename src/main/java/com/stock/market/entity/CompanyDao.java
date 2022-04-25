@@ -1,6 +1,7 @@
 package com.stock.market.entity;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document("Company")
@@ -9,6 +10,7 @@ public class CompanyDao {
 	@Id
 	private String companyId;
 
+	@Indexed(unique=true)
 	private String companyCode;
 
 	private String companyName;

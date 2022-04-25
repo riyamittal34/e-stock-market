@@ -36,15 +36,23 @@ public class CompanyController {
 		applicationLog.info("Entering registerCompany Controller");
 		Boolean isSuccessful = false;
 		CompanyResponse<Boolean> response = new CompanyResponse<Boolean>();
+		ResponseMessage message = new ResponseMessage();
 		try {
 			isSuccessful = companyService.registerCompany(requestBody);
+			if (isSuccessful) {
+				message.setCode("COMPANY_REGISTERED");
+				message.setDescription("Company registered");
+			} else {
+				message.setCode("COMPANY_ALREADY_EXIST");
+				message.setDescription("Company already exists");
+			}
+			response.withMessage(message);
 			response.withData(isSuccessful);
 			applicationLog.info("Exiting registerCompany Controller");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			errorLog.error("Error in Registering the company. error: [{}]", e.getMessage());
 			response.withData(false);
-			ResponseMessage message = new ResponseMessage();
 			message.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			message.setDescription("Error in Registering the company");
 			response.withMessage(message);
@@ -97,19 +105,19 @@ public class CompanyController {
 		try {
 			companies = companyService.getAllCompanyDetails();
 			if (companies != null && companies.size() > 0) {
-				message.setCode("COMPANY_NOT_FOUND");
-				message.setDescription("No Company found");
-				response.withData(companies);
-				response.withMessage(message);
-				applicationLog.info("Entering getAllCompanyDetails Controller");
-				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-			} else {
-				message.setCode("ALL_COMPANY_FETCHED");
-				message.setDescription("Data for all company fetched");
+				message.setCode("DATA_FETCH_SUCCESS");
+				message.setDescription("Fetching all company details");
 				response.withData(companies);
 				response.withMessage(message);
 				applicationLog.info("Entering getAllCompanyDetails Controller");
 				return new ResponseEntity<>(response, HttpStatus.OK);
+			} else {
+				message.setCode("NO_COMPANY_FOUND");
+				message.setDescription("No data found");
+				response.withData(companies);
+				response.withMessage(message);
+				applicationLog.info("Entering getAllCompanyDetails Controller");
+				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			errorLog.error("Error in fetch all company details. error: [{}]", e.getMessage());
@@ -131,6 +139,9 @@ public class CompanyController {
 		try {
 			Boolean isSuccessful = companyService.deleteCompanyByCompanyCode(companyCode);
 			response.withData(isSuccessful);
+			message.setCode("COMPANY_DELETED");
+			message.setDescription("Company with code - " + companyCode + " is deleted");
+			response.withMessage(message);
 			applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
