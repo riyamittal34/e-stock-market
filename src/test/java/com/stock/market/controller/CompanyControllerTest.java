@@ -70,6 +70,11 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("COMPANY_ALREADY_EXIST"))).andReturn();
 	}
 
+	/**
+	 * Register company less company turnover test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyLessCompanyTurnoverTest() throws Exception {
 
@@ -80,6 +85,11 @@ class CompanyControllerTest {
 				.andExpect(content().string(containsString("COMPANY_TURNOVER_IS_LESS"))).andReturn();
 	}
 
+	/**
+	 * Register company less field validation test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyLessFieldValidationTest() throws Exception {
 

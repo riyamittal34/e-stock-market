@@ -137,6 +137,12 @@ public class CompanyServiceImpl implements CompanyService {
 		return isSuccessful;
 	}
 
+	/**
+	 * Validate company fields.
+	 *
+	 * @param company the company
+	 * @return the boolean
+	 */
 	private Boolean validateCompanyFields(CompanyDto company) {
 
 		try {
@@ -165,6 +171,12 @@ public class CompanyServiceImpl implements CompanyService {
 		return false;
 	}
 
+	/**
+	 * String null and empty validation.
+	 *
+	 * @param value the value
+	 * @return the boolean
+	 */
 	private Boolean stringNullAndEmptyValidation(String value) {
 		if (value != null && !value.isEmpty())
 			return true;

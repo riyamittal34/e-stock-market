@@ -92,6 +92,11 @@ public class CompanyServiceTest {
 		assertEquals(1, isSuccessful);
 	}
 
+	/**
+	 * Register company less turnover test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyLessTurnoverTest() throws Exception {
 
@@ -101,6 +106,11 @@ public class CompanyServiceTest {
 		assertEquals(2, isSuccessful);
 	}
 	
+	/**
+	 * Register company field validation failed test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyFieldValidationFailedTest() throws Exception {
 		
@@ -110,6 +120,11 @@ public class CompanyServiceTest {
 		assertEquals(3, isSuccessful);
 	}
 	
+	/**
+	 * Register company malformed URL test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyMalformedURLTest() throws Exception {
 		
@@ -119,6 +134,11 @@ public class CompanyServiceTest {
 		assertEquals(3, isSuccessful);
 	}
 	
+	/**
+	 * Register company turnover field datatype mismatch test.
+	 *
+	 * @throws Exception the exception
+	 */
 	@Test
 	public void registerCompanyTurnoverFieldDatatypeMismatchTest() throws Exception {
 
