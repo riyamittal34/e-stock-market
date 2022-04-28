@@ -57,11 +57,11 @@ public class CompanyServiceTest {
 
 		CompanyDao company = getCompanyObject();
 
-		when(companyRepository.findByCompanyCode("abc")).thenReturn(null);
+		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		when(companyRepository.save(any(CompanyDao.class))).thenReturn(company);
-		Integer isSuccessful = companyService
-				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
-		assertEquals(2, isSuccessful);
+		Integer isSuccessful = companyService.registerCompany(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		assertEquals(0, isSuccessful);
 	}
 
 	/**
@@ -86,21 +86,46 @@ public class CompanyServiceTest {
 
 		CompanyDao company = getCompanyObject();
 
-		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
-		Integer isSuccessful = companyService
-				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
+		when(companyRepository.findByCompanyCode("ghi")).thenReturn(company);
+		Integer isSuccessful = companyService.registerCompany(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
 		assertEquals(1, isSuccessful);
 	}
-	
+
 	@Test
 	public void registerCompanyLessTurnoverTest() throws Exception {
 
-		CompanyDao company = getCompanyObject();
+		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
+		Integer isSuccessful = companyService.registerCompany(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		assertEquals(2, isSuccessful);
+	}
+	
+	@Test
+	public void registerCompanyFieldValidationFailedTest() throws Exception {
+		
+		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
+		Integer isSuccessful = companyService.registerCompany(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		assertEquals(3, isSuccessful);
+	}
+	
+	@Test
+	public void registerCompanyMalformedURLTest() throws Exception {
+		
+		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
+		Integer isSuccessful = companyService.registerCompany(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"dddm\", \"stockExchange\": \"NSE\"}");
+		assertEquals(3, isSuccessful);
+	}
+	
+	@Test
+	public void registerCompanyTurnoverFieldDatatypeMismatchTest() throws Exception {
 
-		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
-		Integer isSuccessful = companyService
-				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
-		assertEquals(0, isSuccessful);
+		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
+		Integer isSuccessful = companyService.registerCompany(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000cr\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		assertEquals(3, isSuccessful);
 	}
 
 	/**

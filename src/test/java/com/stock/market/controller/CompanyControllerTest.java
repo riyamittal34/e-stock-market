@@ -47,10 +47,9 @@ class CompanyControllerTest {
 	@Test
 	public void registerCompanyTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(2);
-		this.mockMvc
-				.perform(post("/api/v1.0/market/company/register")
-						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
+		when(companyService.registerCompany(anyString())).thenReturn(0);
+		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}"))
 				.andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("true")))
 				.andReturn();
 	}
@@ -70,17 +69,25 @@ class CompanyControllerTest {
 				.andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("COMPANY_ALREADY_EXIST"))).andReturn();
 	}
-	
-	
+
 	@Test
 	public void registerCompanyLessCompanyTurnoverTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(0);
-		this.mockMvc
-				.perform(post("/api/v1.0/market/company/register")
-						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
+		when(companyService.registerCompany(anyString())).thenReturn(2);
+		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}"))
 				.andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("COMPANY_TURNOVER_IS_LESS"))).andReturn();
+	}
+
+	@Test
+	public void registerCompanyLessFieldValidationTest() throws Exception {
+
+		when(companyService.registerCompany(anyString())).thenReturn(3);
+		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
+				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("FIELD_VALIDATION_FAILD"))).andReturn();
 	}
 
 	/**
@@ -212,11 +219,11 @@ class CompanyControllerTest {
 	public void deleteCompanyByCompanyCodeTest() throws Exception {
 
 		when(companyService.deleteCompanyByCompanyCode(anyString())).thenReturn(true);
-		
+
 		this.mockMvc.perform(delete("/api/v1.0/market/company/delete/abc")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("COMPANY_DELETED"))).andReturn();
 	}
-	
+
 	/**
 	 * Delete company by company code exception test.
 	 *
@@ -226,8 +233,9 @@ class CompanyControllerTest {
 	public void deleteCompanyByCompanyCodeExceptionTest() throws Exception {
 
 		when(companyService.deleteCompanyByCompanyCode(anyString())).thenThrow(Exception.class);
-		
-		this.mockMvc.perform(delete("/api/v1.0/market/company/delete/abc")).andDo(print()).andExpect(status().isInternalServerError())
+
+		this.mockMvc.perform(delete("/api/v1.0/market/company/delete/abc")).andDo(print())
+				.andExpect(status().isInternalServerError())
 				.andExpect(content().string(containsString("INTERNAL_SERVER_ERROR"))).andReturn();
 	}
 
