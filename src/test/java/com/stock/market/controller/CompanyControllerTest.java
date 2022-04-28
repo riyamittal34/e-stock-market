@@ -47,7 +47,7 @@ class CompanyControllerTest {
 	@Test
 	public void registerCompanyTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(true);
+		when(companyService.registerCompany(anyString())).thenReturn(2);
 		this.mockMvc
 				.perform(post("/api/v1.0/market/company/register")
 						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
@@ -63,12 +63,24 @@ class CompanyControllerTest {
 	@Test
 	public void registerCompanyAlreadyExistTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(false);
+		when(companyService.registerCompany(anyString())).thenReturn(1);
 		this.mockMvc
 				.perform(post("/api/v1.0/market/company/register")
 						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
 				.andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("COMPANY_ALREADY_EXIST"))).andReturn();
+	}
+	
+	
+	@Test
+	public void registerCompanyLessCompanyTurnoverTest() throws Exception {
+
+		when(companyService.registerCompany(anyString())).thenReturn(0);
+		this.mockMvc
+				.perform(post("/api/v1.0/market/company/register")
+						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
+				.andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("COMPANY_TURNOVER_IS_LESS"))).andReturn();
 	}
 
 	/**

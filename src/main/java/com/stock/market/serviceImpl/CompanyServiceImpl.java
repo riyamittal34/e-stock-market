@@ -1,5 +1,7 @@
 package com.stock.market.serviceImpl;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -38,9 +40,9 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @throws Exception the exception
 	 */
 	@Override
-	public Boolean registerCompany(String requestBody) throws Exception {
+	public Integer registerCompany(String requestBody) throws Exception {
 		applicationLog.info("Entering registerCompany Service");
-		Boolean isSuccessful = false;
+		Integer isSuccessful = null;
 		CompanyDto companyDto = null;
 
 		try {
@@ -51,20 +53,31 @@ public class CompanyServiceImpl implements CompanyService {
 		}
 
 		CompanyDao comapanyDao = companyRepository.findByCompanyCode(companyDto.getCompanyCode());
-		if (comapanyDao != null) {
+		if (!validateCompanyFields(companyDto)) {
+			applicationLog.info("Field Validation Failed");
+			isSuccessful = 3;
+		} else if (comapanyDao != null) {
 			applicationLog.info("Company Already Exists");
-			isSuccessful = false;
+			isSuccessful = 1;
+		} else if (Double.parseDouble(companyDto.getCompanyTurnover()) < Double.valueOf(100000000)) {
+			applicationLog.info("Company turnover must be greater than 10Cr");
+			isSuccessful = 2;
 		} else {
 			CompanyDao company = new CompanyDao();
 			company.setCompanyCode(companyDto.getCompanyCode());
 			company.setCompanyName(companyDto.getCompanyName());
+			company.setCompanyCeo(companyDto.getCompanyCeo());
+			company.setCompanyTurnover(companyDto.getCompanyTurnover());
+			company.setCompanyWebsite(companyDto.getCompanyWebsite());
+			company.setStockExchange(companyDto.getStockExchange());
 			try {
 				companyRepository.save(company);
-				isSuccessful = true;
+				isSuccessful = 0;
 			} catch (Exception e) {
 				errorLog.error("Error in saving company details to db. error: {}", e.getMessage());
 				throw e;
 			}
+
 		}
 
 		applicationLog.info("Exiting registerCompany Service");
@@ -124,4 +137,38 @@ public class CompanyServiceImpl implements CompanyService {
 		return isSuccessful;
 	}
 
+	private Boolean validateCompanyFields(CompanyDto company) {
+
+		try {
+			Double.parseDouble(company.getCompanyTurnover());
+		} catch (Exception e) {
+			return false;
+		}
+
+		try {
+			new URL(company.getCompanyWebsite());
+		} catch (MalformedURLException e) {
+			applicationLog.info("Company website is not a url: {}", e.getMessage());
+			return false;
+		}
+
+		if (stringNullAndEmptyValidation(company.getCompanyCeo())
+				&& stringNullAndEmptyValidation(company.getCompanyCode())
+				&& stringNullAndEmptyValidation(company.getCompanyName())
+				&& stringNullAndEmptyValidation(company.getCompanyTurnover())
+				&& stringNullAndEmptyValidation(company.getCompanyWebsite())
+				&& stringNullAndEmptyValidation(company.getStockExchange())) {
+			applicationLog.info("Field validation successful");
+			return true;
+		}
+
+		return false;
+	}
+
+	private Boolean stringNullAndEmptyValidation(String value) {
+		if (value != null && !value.isEmpty())
+			return true;
+		else
+			return false;
+	}
 }

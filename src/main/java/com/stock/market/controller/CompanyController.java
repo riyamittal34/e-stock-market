@@ -46,20 +46,29 @@ public class CompanyController {
 	@PostMapping(value = "/register")
 	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody String requestBody) {
 		applicationLog.info("Entering registerCompany Controller");
-		Boolean isSuccessful = false;
+		Integer isSuccessful = null;
 		CompanyResponse<Boolean> response = new CompanyResponse<Boolean>();
 		ResponseMessage message = new ResponseMessage();
 		try {
 			isSuccessful = companyService.registerCompany(requestBody);
-			if (isSuccessful) {
-				message.setCode("COMPANY_REGISTERED");
-				message.setDescription("Company registered");
-			} else {
+			if (isSuccessful == 2) {
+				message.setCode("COMPANY_TURNOVER_IS_LESS");
+				message.setDescription("Company turnover should be greater than 10Cr");
+				response.withData(false);
+			} else if (isSuccessful == 1) {
 				message.setCode("COMPANY_ALREADY_EXIST");
 				message.setDescription("Company already exists");
+				response.withData(false);
+			} else if (isSuccessful == 3) {
+				message.setCode("FIELD_VALIDATION_FAILD");
+				message.setDescription("Field validation failed");
+				response.withData(false);
+			} else {
+				message.setCode("COMPANY_REGISTERED");
+				message.setDescription("Company registered");
+				response.withData(true);
 			}
 			response.withMessage(message);
-			response.withData(isSuccessful);
 			applicationLog.info("Exiting registerCompany Controller");
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {

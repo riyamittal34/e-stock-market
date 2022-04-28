@@ -9,14 +9,15 @@ import com.stock.market.entity.CompanyDao;
  */
 public interface CompanyService {
 
+	
 	/**
 	 * Register company.
 	 *
 	 * @param requestBody the request body
-	 * @return the boolean
+	 * @return the integer
 	 * @throws Exception the exception
 	 */
-	public Boolean registerCompany(String requestBody) throws Exception;
+	public Integer registerCompany(String requestBody) throws Exception;
 
 	/**
 	 * Gets the company by company code.

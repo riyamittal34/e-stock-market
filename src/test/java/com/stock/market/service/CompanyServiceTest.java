@@ -1,7 +1,6 @@
 package com.stock.market.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -60,9 +59,9 @@ public class CompanyServiceTest {
 
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(null);
 		when(companyRepository.save(any(CompanyDao.class))).thenReturn(company);
-		Boolean isSuccessful = companyService
+		Integer isSuccessful = companyService
 				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
-		assertTrue(isSuccessful);
+		assertEquals(2, isSuccessful);
 	}
 
 	/**
@@ -88,9 +87,20 @@ public class CompanyServiceTest {
 		CompanyDao company = getCompanyObject();
 
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
-		Boolean isSuccessful = companyService
+		Integer isSuccessful = companyService
 				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
-		assertFalse(isSuccessful);
+		assertEquals(1, isSuccessful);
+	}
+	
+	@Test
+	public void registerCompanyLessTurnoverTest() throws Exception {
+
+		CompanyDao company = getCompanyObject();
+
+		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
+		Integer isSuccessful = companyService
+				.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
+		assertEquals(0, isSuccessful);
 	}
 
 	/**
