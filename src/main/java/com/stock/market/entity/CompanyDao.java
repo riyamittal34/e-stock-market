@@ -158,16 +158,4 @@ public class CompanyDao {
 	public void setStockExchange(String stockExchange) {
 		this.stockExchange = stockExchange;
 	}
-
-	/**
-	 * To string.
-	 *
-	 * @return the string
-	 */
-	@Override
-	public String toString() {
-		return "CompanyDao [companyId=" + companyId + ", companyCode=" + companyCode + ", companyName=" + companyName
-				+ ", companyCeo=" + companyCeo + ", companyTurnover=" + companyTurnover + ", companyWebsite="
-				+ companyWebsite + ", stockExchange=" + stockExchange + "]";
-	}
 }
