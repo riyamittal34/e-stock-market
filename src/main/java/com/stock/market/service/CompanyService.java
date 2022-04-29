@@ -2,7 +2,7 @@ package com.stock.market.service;
 
 import java.util.List;
 
-import com.stock.market.entity.CompanyDao;
+import com.stock.market.dto.CompanyDto;
 
 /**
  * The Interface CompanyService.
@@ -26,7 +26,7 @@ public interface CompanyService {
 	 * @return the company by company code
 	 * @throws Exception the exception
 	 */
-	public CompanyDao getCompanyByCompanyCode(String companyCode) throws Exception;
+	public CompanyDto getCompanyByCompanyCode(String companyCode) throws Exception;
 
 	/**
 	 * Gets the all company details.
@@ -34,7 +34,7 @@ public interface CompanyService {
 	 * @return the all company details
 	 * @throws Exception the exception
 	 */
-	public List<CompanyDao> getAllCompanyDetails() throws Exception;
+	public List<CompanyDto> getAllCompanyDetails() throws Exception;
 
 	/**
 	 * Delete company by company code.

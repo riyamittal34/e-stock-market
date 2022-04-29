@@ -1,5 +1,6 @@
 package com.stock.market.dto;
 
+// TODO: Auto-generated Javadoc
 /**
  * The Class CompanyDto.
  */
@@ -25,6 +26,9 @@ public class CompanyDto {
 
 	/** The stock exchange. */
 	private String stockExchange;
+	
+	/** The latest stock price. */
+	private Double latestStockPrice;
 
 	/**
 	 * Gets the comapany id.
@@ -150,5 +154,23 @@ public class CompanyDto {
 	 */
 	public void setStockExchange(String stockExchange) {
 		this.stockExchange = stockExchange;
+	}
+
+	/**
+	 * Gets the latest stock price.
+	 *
+	 * @return the latest stock price
+	 */
+	public Double getLatestStockPrice() {
+		return latestStockPrice;
+	}
+
+	/**
+	 * Sets the latest stock price.
+	 *
+	 * @param latestStockPrice the new latest stock price
+	 */
+	public void setLatestStockPrice(Double latestStockPrice) {
+		this.latestStockPrice = latestStockPrice;
 	}
 }

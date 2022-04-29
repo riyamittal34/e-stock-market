@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
 import com.stock.market.entity.CompanyDao;
@@ -89,11 +90,11 @@ public class CompanyController {
 	 * @return the company by company code
 	 */
 	@GetMapping(value = "/info/{companycode}")
-	public ResponseEntity<CompanyResponse<CompanyDao>> getCompanyByCompanyCode(
+	public ResponseEntity<CompanyResponse<CompanyDto>> getCompanyByCompanyCode(
 			@PathVariable("companycode") String companyCode) {
 		applicationLog.info("Entering getCompanyByCompanyCode Controller");
-		CompanyDao company = null;
-		CompanyResponse<CompanyDao> response = new CompanyResponse<CompanyDao>();
+		CompanyDto company = null;
+		CompanyResponse<CompanyDto> response = new CompanyResponse<CompanyDto>();
 		ResponseMessage message = new ResponseMessage();
 		try {
 			company = companyService.getCompanyByCompanyCode(companyCode);
@@ -129,10 +130,10 @@ public class CompanyController {
 	 * @return the all company details
 	 */
 	@GetMapping(value = "/getall")
-	public ResponseEntity<CompanyResponse<List<CompanyDao>>> getAllCompanyDetails() {
+	public ResponseEntity<CompanyResponse<List<CompanyDto>>> getAllCompanyDetails() {
 		applicationLog.info("Entering getAllCompanyDetails Controller");
-		CompanyResponse<List<CompanyDao>> response = new CompanyResponse<>();
-		List<CompanyDao> companies = null;
+		CompanyResponse<List<CompanyDto>> response = new CompanyResponse<>();
+		List<CompanyDto> companies = null;
 		ResponseMessage message = new ResponseMessage();
 		try {
 			companies = companyService.getAllCompanyDetails();

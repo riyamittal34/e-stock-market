@@ -2,16 +2,23 @@ package com.stock.market.serviceImpl;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stock.market.dto.CompanyDto;
+import com.stock.market.dto.CompanyDtoBuilder;
+import com.stock.market.dto.CompanyResponse;
 import com.stock.market.entity.CompanyDao;
 import com.stock.market.repository.CompanyRepository;
 import com.stock.market.service.CompanyService;
@@ -92,14 +99,31 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @throws Exception the exception
 	 */
 	@Override
-	public CompanyDao getCompanyByCompanyCode(String companyCode) throws Exception {
+	public CompanyDto getCompanyByCompanyCode(String companyCode) throws Exception {
 		applicationLog.info("Entering getCompanybyCompanyCode Service");
 
 		CompanyDao company = companyRepository.findByCompanyCode(companyCode);
 		applicationLog.debug("company: {}", company);
 
+		CompanyDto companyDto = convertCompanyDaoToDto(company);
+
+		RestTemplate restTemplate = new RestTemplate();
+		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/";
+		ResponseEntity<CompanyResponse> response = null;
+		try {
+			response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
+			if (response.getStatusCode().is2xxSuccessful()) {
+				CompanyResponse<Double> companyResponse = response.getBody();
+				if (companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
+					companyDto.setLatestStockPrice(companyResponse.getData());
+				}
+			}
+		} catch (Exception e) {
+			errorLog.error("No stock found for company with company code: {}", company.getCompanyCode());
+		}
+
 		applicationLog.info("Exiting getCompanybyCompanyCode Service");
-		return company;
+		return companyDto;
 	}
 
 	/**
@@ -109,13 +133,37 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @throws Exception the exception
 	 */
 	@Override
-	public List<CompanyDao> getAllCompanyDetails() throws Exception {
+	public List<CompanyDto> getAllCompanyDetails() throws Exception {
 		applicationLog.info("Entering getAllCompanyDetails Service");
 
 		List<CompanyDao> companies = companyRepository.findAll();
 
+		RestTemplate restTemplate = new RestTemplate();
+		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/";
+
+		List<CompanyDto> companyDtos = new ArrayList<CompanyDto>();
+		for (CompanyDao company : companies) {
+			CompanyDto companyDto = convertCompanyDaoToDto(company);
+
+			applicationLog.info("Connecting to : {}", (url + company.getCompanyCode()));
+			ResponseEntity<CompanyResponse> response = null;
+			try {
+				response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
+				if (response.getStatusCode().is2xxSuccessful()) {
+					CompanyResponse<Double> companyResponse = response.getBody();
+					if (companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
+						companyDto.setLatestStockPrice(companyResponse.getData());
+					}
+				}
+			} catch (Exception e) {
+				errorLog.error("No stock found for company with company code: {}", company.getCompanyCode());
+			}
+
+			companyDtos.add(companyDto);
+		}
+
 		applicationLog.info("Exiting getAllCompanyDetails Service");
-		return companies;
+		return companyDtos;
 	}
 
 	/**
@@ -132,6 +180,20 @@ public class CompanyServiceImpl implements CompanyService {
 
 		CompanyDao company = companyRepository.findByCompanyCode(companyCode);
 		companyRepository.delete(company);
+		
+		RestTemplate restTemplate = new RestTemplate();
+		String url = "http://localhost:8086/api/v1.0/market/stock/delete/";
+		
+		ResponseEntity<CompanyResponse> response = null;
+		try {
+//			response = restTemplate.de(url + company.getCompanyCode(), CompanyResponse.class);
+			response = restTemplate.exchange(url + companyCode, HttpMethod.DELETE, null, CompanyResponse.class);
+			if (response.getStatusCode().is2xxSuccessful()) {
+				applicationLog.info("Stocks deleted for company with companycode: {}", company.getCompanyCode());
+			}
+		} catch (Exception e) {
+			errorLog.error("Error in deleting stocks for company with companycode: {}: [{}]", company.getCompanyCode(), e.getMessage());
+		}
 
 		applicationLog.info("Exiting deleteCompanyByCompanyCode Service");
 		return isSuccessful;
@@ -182,5 +244,13 @@ public class CompanyServiceImpl implements CompanyService {
 			return true;
 		else
 			return false;
+	}
+
+	private CompanyDto convertCompanyDaoToDto(CompanyDao dao) {
+		CompanyDto dto = new CompanyDtoBuilder().setComapanyId(dao.getCompanyId()).setCompanyCeo(dao.getCompanyCeo())
+				.setCompanyCode(dao.getCompanyCode()).setCompanyName(dao.getCompanyName())
+				.setCompanyTurnover(dao.getCompanyTurnover()).setCompanyWebsite(dao.getCompanyWebsite())
+				.setStockExchange(dao.getStockExchange()).build();
+		return dto;
 	}
 }
