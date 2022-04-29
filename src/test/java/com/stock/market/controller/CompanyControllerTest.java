@@ -21,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.stock.market.dto.CompanyDto;
 import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
@@ -125,7 +126,7 @@ class CompanyControllerTest {
 	@Test
 	public void getCompanyBycompanyCodeTest() throws Exception {
 
-		CompanyDao company = new CompanyDao();
+		CompanyDto company = new CompanyDto();
 		company.setCompanyCode("abc");
 		company.setCompanyId(UUID.randomUUID().toString());
 		company.setCompanyName("ABC Company");
@@ -176,8 +177,8 @@ class CompanyControllerTest {
 	@Test
 	public void getAllCompanyDetailsTest() throws Exception {
 
-		List<CompanyDao> companies = new ArrayList<CompanyDao>();
-		CompanyDao company = new CompanyDao();
+		List<CompanyDto> companies = new ArrayList<CompanyDto>();
+		CompanyDto company = new CompanyDto();
 		company.setCompanyCode("abc");
 		company.setCompanyId(UUID.randomUUID().toString());
 		company.setCompanyName("ABC Company");
@@ -198,7 +199,7 @@ class CompanyControllerTest {
 	@Test
 	public void getAllCompanyDetailsNullDataTest() throws Exception {
 
-		List<CompanyDao> companies = new ArrayList<CompanyDao>();
+		List<CompanyDto> companies = new ArrayList<CompanyDto>();
 		when(companyService.getAllCompanyDetails()).thenReturn(companies);
 
 		this.mockMvc.perform(get("/api/v1.0/market/company/getall")).andDo(print()).andExpect(status().isNotFound())

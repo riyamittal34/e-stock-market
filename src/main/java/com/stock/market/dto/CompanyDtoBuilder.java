@@ -6,7 +6,7 @@ package com.stock.market.dto;
 public class CompanyDtoBuilder {
 
 	/** The comapany id. */
-	private String comapanyId;
+	private String companyId;
 
 	/** The company code. */
 	private String companyCode;
@@ -29,11 +29,11 @@ public class CompanyDtoBuilder {
 	/**
 	 * Sets the comapany id.
 	 *
-	 * @param comapanyId the comapany id
+	 * @param companyId the comapany id
 	 * @return the company dto builder
 	 */
-	public CompanyDtoBuilder setComapanyId(String comapanyId) {
-		this.comapanyId = comapanyId;
+	public CompanyDtoBuilder setCompanyId(String companyId) {
+		this.companyId = companyId;
 		return this;
 	}
 
@@ -110,7 +110,7 @@ public class CompanyDtoBuilder {
 	 */
 	public CompanyDto build() {
 		CompanyDto company = new CompanyDto();
-		company.setComapanyId(this.comapanyId);
+		company.setCompanyId(this.companyId);
 		company.setCompanyCeo(this.companyCeo);
 		company.setCompanyCode(this.companyCode);
 		company.setCompanyName(this.companyName);

@@ -6,8 +6,8 @@ package com.stock.market.dto;
  */
 public class CompanyDto {
 
-	/** The comapany id. */
-	private String comapanyId;
+	/** The companyId id. */
+	private String companyId;
 
 	/** The company code. */
 	private String companyCode;
@@ -35,17 +35,17 @@ public class CompanyDto {
 	 *
 	 * @return the comapany id
 	 */
-	public String getComapanyId() {
-		return comapanyId;
+	public String getCompanyId() {
+		return companyId;
 	}
 
 	/**
-	 * Sets the comapany id.
+	 * Sets the companyId id.
 	 *
-	 * @param comapanyId the new comapany id
+	 * @param companyId the new companyId id
 	 */
-	public void setComapanyId(String comapanyId) {
-		this.comapanyId = comapanyId;
+	public void setCompanyId(String companyId) {
+		this.companyId = companyId;
 	}
 
 	/**

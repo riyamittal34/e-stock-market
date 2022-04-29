@@ -16,9 +16,17 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.matchers.Any;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.client.RestTemplate;
 
+import com.stock.market.dto.CompanyDto;
+import com.stock.market.dto.CompanyResponse;
+import com.stock.market.dto.ResponseMessage;
 import com.stock.market.entity.CompanyDao;
 import com.stock.market.repository.CompanyRepository;
 import com.stock.market.serviceImpl.CompanyServiceImpl;
@@ -38,6 +46,12 @@ public class CompanyServiceTest {
 	@Mock
 	CompanyRepository companyRepository;
 
+	@MockBean
+	RestTemplate restTemplate;
+	
+	@MockBean
+	ResponseEntity<CompanyResponse> responseEntity;
+	
 	/**
 	 * Sets the up.
 	 */
@@ -175,11 +189,32 @@ public class CompanyServiceTest {
 		CompanyDao company = getCompanyObject();
 
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
-		CompanyDao companyDao = companyService.getCompanyByCompanyCode("abc");
+		CompanyDto companyDto = companyService.getCompanyByCompanyCode("abc");
 
-		assertEquals(company.getCompanyCode(), companyDao.getCompanyCode());
-		assertEquals(company.getCompanyId(), companyDao.getCompanyId());
-		assertEquals(company.getCompanyName(), companyDao.getCompanyName());
+		assertEquals(company.getCompanyCode(), companyDto.getCompanyCode());
+		assertEquals(company.getCompanyId(), companyDto.getCompanyId());
+		assertEquals(company.getCompanyName(), companyDto.getCompanyName());
+	}
+	
+	@Test
+	public void getCompanyByCompanyCodeStockPriceTest() throws Exception {
+		CompanyDao company = getCompanyObject();
+
+		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/abc";
+		CompanyResponse response = new CompanyResponse<>();
+		response.withData(200.0);
+		ResponseMessage message = new ResponseMessage();
+		message.setCode("LATEST_STOCK_PRICE_FETCHED");
+		response.withMessage(message);
+//		ResponseEntity<CompanyResponse> entity = new ResponseEntity<CompanyResponse>(response, HttpStatus.OK); 
+		
+		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
+		when(restTemplate.getForEntity(url, CompanyResponse.class)).thenReturn(responseEntity);
+		CompanyDto companyDto = companyService.getCompanyByCompanyCode("abc");
+
+		assertEquals(company.getCompanyCode(), companyDto.getCompanyCode());
+		assertEquals(company.getCompanyId(), companyDto.getCompanyId());
+		assertEquals(company.getCompanyName(), companyDto.getCompanyName());
 	}
 
 	/**
@@ -195,7 +230,7 @@ public class CompanyServiceTest {
 		mockCompanies.add(getCompanyObject());
 
 		when(companyRepository.findAll()).thenReturn(mockCompanies);
-		List<CompanyDao> companies = companyService.getAllCompanyDetails();
+		List<CompanyDto> companies = companyService.getAllCompanyDetails();
 
 		assertEquals(1, companies.size());
 	}
@@ -224,6 +259,10 @@ public class CompanyServiceTest {
 		company.setCompanyCode("abc");
 		company.setCompanyId(UUID.randomUUID().toString());
 		company.setCompanyName("ABC Company");
+		company.setCompanyCeo("Riya");
+		company.setCompanyTurnover("1000000000");
+		company.setCompanyWebsite("http://www.google.com");
+		company.setStockExchange("NSE");
 		return company;
 	}
 }

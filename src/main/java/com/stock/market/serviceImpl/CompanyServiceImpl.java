@@ -8,7 +8,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -186,7 +185,6 @@ public class CompanyServiceImpl implements CompanyService {
 		
 		ResponseEntity<CompanyResponse> response = null;
 		try {
-//			response = restTemplate.de(url + company.getCompanyCode(), CompanyResponse.class);
 			response = restTemplate.exchange(url + companyCode, HttpMethod.DELETE, null, CompanyResponse.class);
 			if (response.getStatusCode().is2xxSuccessful()) {
 				applicationLog.info("Stocks deleted for company with companycode: {}", company.getCompanyCode());
@@ -247,7 +245,7 @@ public class CompanyServiceImpl implements CompanyService {
 	}
 
 	private CompanyDto convertCompanyDaoToDto(CompanyDao dao) {
-		CompanyDto dto = new CompanyDtoBuilder().setComapanyId(dao.getCompanyId()).setCompanyCeo(dao.getCompanyCeo())
+		CompanyDto dto = new CompanyDtoBuilder().setCompanyId(dao.getCompanyId()).setCompanyCeo(dao.getCompanyCeo())
 				.setCompanyCode(dao.getCompanyCode()).setCompanyName(dao.getCompanyName())
 				.setCompanyTurnover(dao.getCompanyTurnover()).setCompanyWebsite(dao.getCompanyWebsite())
 				.setStockExchange(dao.getStockExchange()).build();
