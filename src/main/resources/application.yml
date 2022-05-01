@@ -1,1 +1,1 @@
-spring:  application:    name: stock-market-service  config:    import: optional:configserver:http://localhost:8888/ management:  endpoints:    web:      exposure:        include: "health,info,metrics"        exclude:         
+spring:  application:    name: stock-market-service  config:    import: optional:configserver:http://localhost:8888/ management:  endpoints:    web:      exposure:        include: "health,info,metrics"        exclude:         
