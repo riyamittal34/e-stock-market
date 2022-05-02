@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,8 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyDtoBuilder;
 import com.stock.market.dto.CompanyResponse;
@@ -37,6 +40,10 @@ public class CompanyServiceImpl implements CompanyService {
 	/** The company repository. */
 	@Autowired
 	CompanyRepository companyRepository;
+
+	/** The eureka client. */
+	@Autowired
+	EurekaClient eurekaClient;
 
 	/**
 	 * Register company.
@@ -108,7 +115,9 @@ public class CompanyServiceImpl implements CompanyService {
 		CompanyDto companyDto = convertCompanyDaoToDto(company);
 
 		RestTemplate restTemplate = new RestTemplate();
-		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/";
+		InstanceInfo instance = getStockServiceInstance();
+		String url = "http://" + instance.getHostName() + ":" + instance.getPort()
+				+ "/api/v1.0/market/stock/get/stockPrice/";
 		ResponseEntity<CompanyResponse> response = null;
 		try {
 			response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
@@ -119,7 +128,8 @@ public class CompanyServiceImpl implements CompanyService {
 				}
 			}
 		} catch (Exception e) {
-			errorLog.error("No stock found for company with company code: {}", company.getCompanyCode());
+			errorLog.error("No stock found for company with company code: {}: {}", company.getCompanyCode(),
+					e.getMessage());
 		}
 
 		applicationLog.info("Exiting getCompanybyCompanyCode Service");
@@ -140,7 +150,9 @@ public class CompanyServiceImpl implements CompanyService {
 		List<CompanyDao> companies = companyRepository.findAll();
 
 		RestTemplate restTemplate = new RestTemplate();
-		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/";
+		InstanceInfo instance = getStockServiceInstance();
+		String url = "http://" + instance.getHostName() + ":" + instance.getPort()
+				+ "/api/v1.0/market/stock/get/stockPrice/";
 
 		List<CompanyDto> companyDtos = new ArrayList<CompanyDto>();
 		for (CompanyDao company : companies) {
@@ -184,7 +196,8 @@ public class CompanyServiceImpl implements CompanyService {
 		companyRepository.delete(company);
 
 		RestTemplate restTemplate = new RestTemplate();
-		String url = "http://localhost:8086/api/v1.0/market/stock/delete/";
+		InstanceInfo instance = getStockServiceInstance();
+		String url = "http://" + instance.getHostName() + ":" + instance.getPort() + "/api/v1.0/market/stock/delete/";
 
 		ResponseEntity<CompanyResponse> response = null;
 		try {
@@ -260,5 +273,17 @@ public class CompanyServiceImpl implements CompanyService {
 				.setCompanyTurnover(dao.getCompanyTurnover()).setCompanyWebsite(dao.getCompanyWebsite())
 				.setStockExchange(dao.getStockExchange()).build();
 		return dto;
+	}
+
+	/**
+	 * Gets the stock service instance.
+	 *
+	 * @return the stock service instance
+	 */
+	private InstanceInfo getStockServiceInstance() {
+		List<InstanceInfo> instances = eurekaClient.getApplication("stock-service").getInstances();
+		Integer randomIndex = new Random().nextInt(instances.size());
+		InstanceInfo instance = instances.get(randomIndex);
+		return instance;
 	}
 }

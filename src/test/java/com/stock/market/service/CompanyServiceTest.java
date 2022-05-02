@@ -3,6 +3,7 @@ package com.stock.market.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -24,6 +25,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
+import com.netflix.appinfo.InstanceInfo;
+import com.netflix.discovery.EurekaClient;
+import com.netflix.discovery.shared.Application;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
@@ -54,6 +58,15 @@ public class CompanyServiceTest {
 	@SuppressWarnings("rawtypes")
 	@MockBean
 	ResponseEntity<CompanyResponse> responseEntity;
+	
+	@MockBean
+	EurekaClient eurekaClient;
+	
+	@Mock
+	Application application;
+	
+	@Mock
+	InstanceInfo instance;
 
 	/**
 	 * Sets the up.
@@ -190,8 +203,14 @@ public class CompanyServiceTest {
 	public void getCompanyByCompanyCodeTest() throws Exception {
 
 		CompanyDao company = getCompanyObject();
+		List<InstanceInfo> instances = new ArrayList<>();
+		instances.add(instance);
 
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
+		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
+		when(application.getInstances()).thenReturn(instances);
+		when(instance.getHostName()).thenReturn("");
+		when(instance.getPort()).thenReturn(0);
 		CompanyDto companyDto = companyService.getCompanyByCompanyCode("abc");
 
 		assertEquals(company.getCompanyCode(), companyDto.getCompanyCode());
@@ -217,8 +236,15 @@ public class CompanyServiceTest {
 		message.setCode("LATEST_STOCK_PRICE_FETCHED");
 		response.withMessage(message);
 		ResponseEntity<CompanyResponse> entity = new ResponseEntity<CompanyResponse>(response, HttpStatus.OK);
+		
+		List<InstanceInfo> instances = new ArrayList<>();
+		instances.add(instance);
 
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
+		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
+		when(application.getInstances()).thenReturn(instances);
+		when(instance.getHostName()).thenReturn("");
+		when(instance.getPort()).thenReturn(0);
 		when(restTemplate.getForEntity(ArgumentMatchers.anyString(), ArgumentMatchers.any(Class.class)))
 				.thenReturn(entity);
 		CompanyDto companyDto = companyService.getCompanyByCompanyCode("abc");
@@ -240,7 +266,14 @@ public class CompanyServiceTest {
 		List<CompanyDao> mockCompanies = new ArrayList<CompanyDao>();
 		mockCompanies.add(getCompanyObject());
 
+		List<InstanceInfo> instances = new ArrayList<>();
+		instances.add(instance);
+		
 		when(companyRepository.findAll()).thenReturn(mockCompanies);
+		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
+		when(application.getInstances()).thenReturn(instances);
+		when(instance.getHostName()).thenReturn("");
+		when(instance.getPort()).thenReturn(0);
 		List<CompanyDto> companies = companyService.getAllCompanyDetails();
 
 		assertEquals(1, companies.size());
@@ -253,8 +286,15 @@ public class CompanyServiceTest {
 	 */
 	@Test
 	public void deleteCompanyByCompanyCodeTest() throws Exception {
+		
+		List<InstanceInfo> instances = new ArrayList<>();
+		instances.add(instance);
 
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(getCompanyObject());
+		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
+		when(application.getInstances()).thenReturn(instances);
+		when(instance.getHostName()).thenReturn("");
+		when(instance.getPort()).thenReturn(0);
 		Boolean isSuccess = companyService.deleteCompanyByCompanyCode("abc");
 
 		assertTrue(isSuccess);
