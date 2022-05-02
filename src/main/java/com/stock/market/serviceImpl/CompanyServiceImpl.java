@@ -97,6 +97,7 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @return the company by company code
 	 * @throws Exception the exception
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public CompanyDto getCompanyByCompanyCode(String companyCode) throws Exception {
 		applicationLog.info("Entering getCompanybyCompanyCode Service");
@@ -131,6 +132,7 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @return the all company details
 	 * @throws Exception the exception
 	 */
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List<CompanyDto> getAllCompanyDetails() throws Exception {
 		applicationLog.info("Entering getAllCompanyDetails Service");
@@ -172,6 +174,7 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @return the boolean
 	 * @throws Exception the exception
 	 */
+	@SuppressWarnings("rawtypes")
 	@Override
 	public Boolean deleteCompanyByCompanyCode(String companyCode) throws Exception {
 		applicationLog.info("Entering deleteCompanyByCompanyCode Service");
@@ -179,10 +182,10 @@ public class CompanyServiceImpl implements CompanyService {
 
 		CompanyDao company = companyRepository.findByCompanyCode(companyCode);
 		companyRepository.delete(company);
-		
+
 		RestTemplate restTemplate = new RestTemplate();
 		String url = "http://localhost:8086/api/v1.0/market/stock/delete/";
-		
+
 		ResponseEntity<CompanyResponse> response = null;
 		try {
 			response = restTemplate.exchange(url + companyCode, HttpMethod.DELETE, null, CompanyResponse.class);
@@ -190,7 +193,8 @@ public class CompanyServiceImpl implements CompanyService {
 				applicationLog.info("Stocks deleted for company with companycode: {}", company.getCompanyCode());
 			}
 		} catch (Exception e) {
-			errorLog.error("Error in deleting stocks for company with companycode: {}: [{}]", company.getCompanyCode(), e.getMessage());
+			errorLog.error("Error in deleting stocks for company with companycode: {}: [{}]", company.getCompanyCode(),
+					e.getMessage());
 		}
 
 		applicationLog.info("Exiting deleteCompanyByCompanyCode Service");
@@ -244,6 +248,12 @@ public class CompanyServiceImpl implements CompanyService {
 			return false;
 	}
 
+	/**
+	 * Convert company dao to dto.
+	 *
+	 * @param dao the dao
+	 * @return the company dto
+	 */
 	private CompanyDto convertCompanyDaoToDto(CompanyDao dao) {
 		CompanyDto dto = new CompanyDtoBuilder().setCompanyId(dao.getCompanyId()).setCompanyCeo(dao.getCompanyCeo())
 				.setCompanyCode(dao.getCompanyCode()).setCompanyName(dao.getCompanyName())

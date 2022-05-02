@@ -1,6 +1,5 @@
 package com.stock.market.dto;
 
-// TODO: Auto-generated Javadoc
 /**
  * The Class CompanyDto.
  */

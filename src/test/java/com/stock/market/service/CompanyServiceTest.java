@@ -13,10 +13,10 @@ import java.util.UUID;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.matchers.Any;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,12 +46,15 @@ public class CompanyServiceTest {
 	@Mock
 	CompanyRepository companyRepository;
 
-	@MockBean
+	/** The rest template. */
+	@Mock
 	RestTemplate restTemplate;
-	
+
+	/** The response entity. */
+	@SuppressWarnings("rawtypes")
 	@MockBean
 	ResponseEntity<CompanyResponse> responseEntity;
-	
+
 	/**
 	 * Sets the up.
 	 */
@@ -119,7 +122,7 @@ public class CompanyServiceTest {
 				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
 		assertEquals(2, isSuccessful);
 	}
-	
+
 	/**
 	 * Register company field validation failed test.
 	 *
@@ -127,13 +130,13 @@ public class CompanyServiceTest {
 	 */
 	@Test
 	public void registerCompanyFieldValidationFailedTest() throws Exception {
-		
+
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(
 				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
 		assertEquals(3, isSuccessful);
 	}
-	
+
 	/**
 	 * Register company malformed URL test.
 	 *
@@ -141,13 +144,13 @@ public class CompanyServiceTest {
 	 */
 	@Test
 	public void registerCompanyMalformedURLTest() throws Exception {
-		
+
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(
 				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"dddm\", \"stockExchange\": \"NSE\"}");
 		assertEquals(3, isSuccessful);
 	}
-	
+
 	/**
 	 * Register company turnover field datatype mismatch test.
 	 *
@@ -195,21 +198,29 @@ public class CompanyServiceTest {
 		assertEquals(company.getCompanyId(), companyDto.getCompanyId());
 		assertEquals(company.getCompanyName(), companyDto.getCompanyName());
 	}
-	
+
+	/**
+	 * Gets the company by company code stock price test.
+	 *
+	 * @return the company by company code stock price test
+	 * @throws Exception the exception
+	 */
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	public void getCompanyByCompanyCodeStockPriceTest() throws Exception {
 		CompanyDao company = getCompanyObject();
 
-		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/abc";
-		CompanyResponse response = new CompanyResponse<>();
+//		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/abc";
+		CompanyResponse<Double> response = new CompanyResponse<>();
 		response.withData(200.0);
 		ResponseMessage message = new ResponseMessage();
 		message.setCode("LATEST_STOCK_PRICE_FETCHED");
 		response.withMessage(message);
-//		ResponseEntity<CompanyResponse> entity = new ResponseEntity<CompanyResponse>(response, HttpStatus.OK); 
-		
+		ResponseEntity<CompanyResponse> entity = new ResponseEntity<CompanyResponse>(response, HttpStatus.OK);
+
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
-		when(restTemplate.getForEntity(url, CompanyResponse.class)).thenReturn(responseEntity);
+		when(restTemplate.getForEntity(ArgumentMatchers.anyString(), ArgumentMatchers.any(Class.class)))
+				.thenReturn(entity);
 		CompanyDto companyDto = companyService.getCompanyByCompanyCode("abc");
 
 		assertEquals(company.getCompanyCode(), companyDto.getCompanyCode());

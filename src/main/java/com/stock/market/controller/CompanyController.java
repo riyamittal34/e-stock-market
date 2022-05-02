@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
-import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
 /**
