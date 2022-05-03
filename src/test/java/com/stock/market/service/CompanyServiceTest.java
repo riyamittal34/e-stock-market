@@ -3,7 +3,6 @@ package com.stock.market.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -58,13 +57,13 @@ public class CompanyServiceTest {
 	@SuppressWarnings("rawtypes")
 	@MockBean
 	ResponseEntity<CompanyResponse> responseEntity;
-	
+
 	@MockBean
 	EurekaClient eurekaClient;
-	
+
 	@Mock
 	Application application;
-	
+
 	@Mock
 	InstanceInfo instance;
 
@@ -236,7 +235,7 @@ public class CompanyServiceTest {
 		message.setCode("LATEST_STOCK_PRICE_FETCHED");
 		response.withMessage(message);
 		ResponseEntity<CompanyResponse> entity = new ResponseEntity<CompanyResponse>(response, HttpStatus.OK);
-		
+
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
 
@@ -268,7 +267,7 @@ public class CompanyServiceTest {
 
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
-		
+
 		when(companyRepository.findAll()).thenReturn(mockCompanies);
 		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
 		when(application.getInstances()).thenReturn(instances);
@@ -286,7 +285,7 @@ public class CompanyServiceTest {
 	 */
 	@Test
 	public void deleteCompanyByCompanyCodeTest() throws Exception {
-		
+
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
 
