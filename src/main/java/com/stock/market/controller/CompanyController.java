@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.stock.market.constants.CompanyConstants;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
@@ -52,24 +53,24 @@ public class CompanyController {
 		try {
 			isSuccessful = companyService.registerCompany(requestBody);
 			if (isSuccessful == 2) {
-				message.setCode("COMPANY_TURNOVER_IS_LESS");
+				message.setCode(CompanyConstants.COMPANY_TURNOVER_IS_LESS);
 				message.setDescription("Company turnover should be greater than 10Cr");
 				response.withData(false);
 			} else if (isSuccessful == 1) {
-				message.setCode("COMPANY_ALREADY_EXIST");
+				message.setCode(CompanyConstants.COMPANY_ALREADY_EXIST);
 				message.setDescription("Company already exists");
 				response.withData(false);
 			} else if (isSuccessful == 3) {
-				message.setCode("FIELD_VALIDATION_FAILD");
+				message.setCode(CompanyConstants.FIELD_VALIDATION_FAILD);
 				message.setDescription("Field validation failed");
 				response.withData(false);
 			} else {
-				message.setCode("COMPANY_REGISTERED");
+				message.setCode(CompanyConstants.COMPANY_REGISTERED);
 				message.setDescription("Company registered");
 				response.withData(true);
 			}
 			response.withMessage(message);
-			applicationLog.info("Exiting registerCompany Controller");
+			applicationLog.info(CompanyConstants.EXITING_REGISTER_COMPANY_CONTROLLER);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			errorLog.error("Error in Registering the company. error: [{}]", e.getMessage());
@@ -77,7 +78,7 @@ public class CompanyController {
 			message.setCode(HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			message.setDescription("Error in Registering the company");
 			response.withMessage(message);
-			applicationLog.info("Exiting registerCompany Controller");
+			applicationLog.info(CompanyConstants.EXITING_REGISTER_COMPANY_CONTROLLER);
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -97,15 +98,15 @@ public class CompanyController {
 		ResponseMessage message = new ResponseMessage();
 		try {
 			company = companyService.getCompanyByCompanyCode(companyCode);
-			applicationLog.info("Entering getCompanyByCompanyCode Controller");
+			applicationLog.info(CompanyConstants.EXITING_GET_COMPANY_BY_CODE_CONTROLLER);
 			if (company == null) {
-				message.setCode("COMPANY_NOT_FOUND");
+				message.setCode(CompanyConstants.COMPANY_NOT_FOUND);
 				message.setDescription("No company found with company code: " + companyCode);
 				response.withData(company);
 				response.withMessage(message);
 				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 			} else {
-				message.setCode("COMPANY_FOUND");
+				message.setCode(CompanyConstants.COMPANY_FOUND);
 				message.setDescription("Company found with the company code: " + companyCode);
 				response.withData(company);
 				response.withMessage(message);
@@ -114,11 +115,11 @@ public class CompanyController {
 		} catch (Exception e) {
 			errorLog.error("Error in fetching company details for company code: {}, error: {}", companyCode,
 					e.getMessage());
-			message.setCode("INTERNAL_SERVER_ERROR");
+			message.setCode(CompanyConstants.INTERNAL_SERVER_ERROR);
 			message.setDescription("Error in fetching company with company code: " + companyCode);
 			response.withData(company);
 			response.withMessage(message);
-			applicationLog.info("Entering getCompanyByCompanyCode Controller");
+			applicationLog.info(CompanyConstants.EXITING_GET_COMPANY_BY_CODE_CONTROLLER);
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -137,27 +138,27 @@ public class CompanyController {
 		try {
 			companies = companyService.getAllCompanyDetails();
 			if (companies != null && companies.size() > 0) {
-				message.setCode("DATA_FETCH_SUCCESS");
+				message.setCode(CompanyConstants.DATA_FETCH_SUCCESS);
 				message.setDescription("Fetching all company details");
 				response.withData(companies);
 				response.withMessage(message);
-				applicationLog.info("Entering getAllCompanyDetails Controller");
+				applicationLog.info(CompanyConstants.EXITING_ALL_COMPANY_CONTROLLER);
 				return new ResponseEntity<>(response, HttpStatus.OK);
 			} else {
-				message.setCode("NO_COMPANY_FOUND");
+				message.setCode(CompanyConstants.NO_COMPANY_FOUND);
 				message.setDescription("No data found");
 				response.withData(companies);
 				response.withMessage(message);
-				applicationLog.info("Entering getAllCompanyDetails Controller");
+				applicationLog.info(CompanyConstants.EXITING_ALL_COMPANY_CONTROLLER);
 				return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
 			}
 		} catch (Exception e) {
 			errorLog.error("Error in fetch all company details. error: [{}]", e.getMessage());
-			message.setCode("INTERNAL_SERVER_ERROR");
+			message.setCode(CompanyConstants.INTERNAL_SERVER_ERROR);
 			message.setDescription("Error in fetching all company data");
 			response.withData(companies);
 			response.withMessage(message);
-			applicationLog.info("Entering getAllCompanyDetails Controller");
+			applicationLog.info(CompanyConstants.EXITING_ALL_COMPANY_CONTROLLER);
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}
@@ -177,19 +178,19 @@ public class CompanyController {
 		try {
 			Boolean isSuccessful = companyService.deleteCompanyByCompanyCode(companyCode);
 			response.withData(isSuccessful);
-			message.setCode("COMPANY_DELETED");
+			message.setCode(CompanyConstants.COMPANY_DELETED);
 			message.setDescription("Company with code - " + companyCode + " is deleted");
 			response.withMessage(message);
-			applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
+			applicationLog.info(CompanyConstants.EXITING_DELETE_COMPANY_BY_CODE_CONTROLLER);
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		} catch (Exception e) {
 			errorLog.error("Error in deleting company with company code: [{}], error: [{}]", companyCode,
 					e.getMessage());
-			message.setCode("INTERNAL_SERVER_ERROR");
+			message.setCode(CompanyConstants.INTERNAL_SERVER_ERROR);
 			message.setDescription("Error in deleting company with company code: " + companyCode);
 			response.withData(false);
 			response.withMessage(message);
-			applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
+			applicationLog.info(CompanyConstants.EXITING_DELETE_COMPANY_BY_CODE_CONTROLLER);
 			return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

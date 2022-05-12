@@ -4,7 +4,6 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -123,7 +122,7 @@ public class CompanyServiceImpl implements CompanyService {
 			response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
 			if (response.getStatusCode().is2xxSuccessful()) {
 				CompanyResponse<Double> companyResponse = response.getBody();
-				if (companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
+				if (null != companyResponse && companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
 					companyDto.setLatestStockPrice(companyResponse.getData());
 				}
 			}
@@ -164,7 +163,7 @@ public class CompanyServiceImpl implements CompanyService {
 				response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
 				if (response.getStatusCode().is2xxSuccessful()) {
 					CompanyResponse<Double> companyResponse = response.getBody();
-					if (companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
+					if (null != companyResponse && companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
 						companyDto.setLatestStockPrice(companyResponse.getData());
 					}
 				}
@@ -282,8 +281,7 @@ public class CompanyServiceImpl implements CompanyService {
 	 */
 	private InstanceInfo getStockServiceInstance() {
 		List<InstanceInfo> instances = eurekaClient.getApplication("stock-service").getInstances();
-		Integer randomIndex = new Random().nextInt(instances.size());
-		InstanceInfo instance = instances.get(randomIndex);
+		InstanceInfo instance = instances.get(0);
 		return instance;
 	}
 }

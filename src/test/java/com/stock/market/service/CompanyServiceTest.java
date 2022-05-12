@@ -39,7 +39,7 @@ import com.stock.market.serviceImpl.CompanyServiceImpl;
  */
 @SpringBootTest
 @AutoConfigureMockMvc
-public class CompanyServiceTest {
+class CompanyServiceTest {
 
 	/** The company service. */
 	@InjectMocks
@@ -82,7 +82,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyTest() throws Exception {
+	void registerCompanyTest() throws Exception {
 
 		CompanyDao company = getCompanyObject();
 
@@ -99,7 +99,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyMappingExceptionTest() throws Exception {
+	void registerCompanyMappingExceptionTest() throws Exception {
 		Assertions.assertThrows(Exception.class, () -> {
 			companyService.registerCompany("TestData");
 		});
@@ -111,7 +111,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyAlreadyExistTest() throws Exception {
+	void registerCompanyAlreadyExistTest() throws Exception {
 
 		CompanyDao company = getCompanyObject();
 
@@ -127,7 +127,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyLessTurnoverTest() throws Exception {
+	void registerCompanyLessTurnoverTest() throws Exception {
 
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(
@@ -141,7 +141,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyFieldValidationFailedTest() throws Exception {
+	void registerCompanyFieldValidationFailedTest() throws Exception {
 
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(
@@ -155,7 +155,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyMalformedURLTest() throws Exception {
+	void registerCompanyMalformedURLTest() throws Exception {
 
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(
@@ -169,7 +169,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanyTurnoverFieldDatatypeMismatchTest() throws Exception {
+	void registerCompanyTurnoverFieldDatatypeMismatchTest() throws Exception {
 
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(
@@ -183,7 +183,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void registerCompanySaveExceptionTest() throws Exception {
+	void registerCompanySaveExceptionTest() throws Exception {
 
 		Assertions.assertThrows(Exception.class, () -> {
 			when(companyRepository.findByCompanyCode(anyString())).thenReturn(null);
@@ -199,7 +199,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void getCompanyByCompanyCodeTest() throws Exception {
+	void getCompanyByCompanyCodeTest() throws Exception {
 
 		CompanyDao company = getCompanyObject();
 		List<InstanceInfo> instances = new ArrayList<>();
@@ -225,7 +225,7 @@ public class CompanyServiceTest {
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void getCompanyByCompanyCodeStockPriceTest() throws Exception {
+	void getCompanyByCompanyCodeStockPriceTest() throws Exception {
 		CompanyDao company = getCompanyObject();
 
 //		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/abc";
@@ -260,7 +260,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void getAllCompanyDetailsTest() throws Exception {
+	void getAllCompanyDetailsTest() throws Exception {
 
 		List<CompanyDao> mockCompanies = new ArrayList<CompanyDao>();
 		mockCompanies.add(getCompanyObject());
@@ -284,7 +284,7 @@ public class CompanyServiceTest {
 	 * @throws Exception the exception
 	 */
 	@Test
-	public void deleteCompanyByCompanyCodeTest() throws Exception {
+	void deleteCompanyByCompanyCodeTest() throws Exception {
 
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
