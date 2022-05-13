@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,6 +32,7 @@ import com.stock.market.dto.ResponseMessage;
 import com.stock.market.entity.CompanyDao;
 import com.stock.market.repository.CompanyRepository;
 import com.stock.market.serviceImpl.CompanyServiceImpl;
+import com.stock.market.util.MockSample;
 
 /**
  * The Class CompanyServiceTest.
@@ -84,25 +84,12 @@ class CompanyServiceTest {
 	@Test
 	void registerCompanyTest() throws Exception {
 
-		CompanyDao company = getCompanyObject();
+		CompanyDao company = MockSample.getCompanyObject();
 
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		when(companyRepository.save(any(CompanyDao.class))).thenReturn(company);
-		Integer isSuccessful = companyService.registerCompany(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(0, isSuccessful);
-	}
-
-	/**
-	 * Register company mapping exception test.
-	 *
-	 * @throws Exception the exception
-	 */
-	@Test
-	void registerCompanyMappingExceptionTest() throws Exception {
-		Assertions.assertThrows(Exception.class, () -> {
-			companyService.registerCompany("TestData");
-		});
 	}
 
 	/**
@@ -113,11 +100,9 @@ class CompanyServiceTest {
 	@Test
 	void registerCompanyAlreadyExistTest() throws Exception {
 
-		CompanyDao company = getCompanyObject();
-
-		when(companyRepository.findByCompanyCode("ghi")).thenReturn(company);
-		Integer isSuccessful = companyService.registerCompany(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		CompanyDao company = MockSample.getCompanyObject();
+		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
+		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(1, isSuccessful);
 	}
 
@@ -128,10 +113,10 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyLessTurnoverTest() throws Exception {
-
+		CompanyDao company = MockSample.getCompanyObject();
+		company.setCompanyTurnover("3434");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
-		Integer isSuccessful = companyService.registerCompany(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(2, isSuccessful);
 	}
 
@@ -142,10 +127,10 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyFieldValidationFailedTest() throws Exception {
-
+		CompanyDao company = MockSample.getCompanyObject();
+		company.setCompanyCeo("");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
-		Integer isSuccessful = companyService.registerCompany(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(3, isSuccessful);
 	}
 
@@ -156,10 +141,10 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyMalformedURLTest() throws Exception {
-
+		CompanyDao company = MockSample.getCompanyObject();
+		company.setCompanyWebsite("url");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
-		Integer isSuccessful = companyService.registerCompany(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"dddm\", \"stockExchange\": \"NSE\"}");
+		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(3, isSuccessful);
 	}
 
@@ -170,10 +155,10 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyTurnoverFieldDatatypeMismatchTest() throws Exception {
-
+		CompanyDao company = MockSample.getCompanyObject();
+		company.setCompanyTurnover("30Cr");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
-		Integer isSuccessful = companyService.registerCompany(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000cr\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}");
+		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(3, isSuccessful);
 	}
 
@@ -188,7 +173,7 @@ class CompanyServiceTest {
 		Assertions.assertThrows(Exception.class, () -> {
 			when(companyRepository.findByCompanyCode(anyString())).thenReturn(null);
 			when(companyRepository.save(any(CompanyDao.class))).thenThrow(Exception.class);
-			companyService.registerCompany("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}");
+			companyService.registerCompany(MockSample.getCompanyObject());
 		});
 	}
 
@@ -201,7 +186,7 @@ class CompanyServiceTest {
 	@Test
 	void getCompanyByCompanyCodeTest() throws Exception {
 
-		CompanyDao company = getCompanyObject();
+		CompanyDao company = MockSample.getCompanyObject();
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
 
@@ -226,9 +211,8 @@ class CompanyServiceTest {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void getCompanyByCompanyCodeStockPriceTest() throws Exception {
-		CompanyDao company = getCompanyObject();
+		CompanyDao company = MockSample.getCompanyObject();
 
-//		String url = "http://localhost:8086/api/v1.0/market/stock/get/stockPrice/abc";
 		CompanyResponse<Double> response = new CompanyResponse<>();
 		response.withData(200.0);
 		ResponseMessage message = new ResponseMessage();
@@ -263,7 +247,7 @@ class CompanyServiceTest {
 	void getAllCompanyDetailsTest() throws Exception {
 
 		List<CompanyDao> mockCompanies = new ArrayList<CompanyDao>();
-		mockCompanies.add(getCompanyObject());
+		mockCompanies.add(MockSample.getCompanyObject());
 
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
@@ -289,7 +273,7 @@ class CompanyServiceTest {
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
 
-		when(companyRepository.findByCompanyCode("abc")).thenReturn(getCompanyObject());
+		when(companyRepository.findByCompanyCode("abc")).thenReturn(MockSample.getCompanyObject());
 		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
 		when(application.getInstances()).thenReturn(instances);
 		when(instance.getHostName()).thenReturn("");
@@ -298,21 +282,5 @@ class CompanyServiceTest {
 
 		assertTrue(isSuccess);
 	}
-
-	/**
-	 * Gets the company object.
-	 *
-	 * @return the company object
-	 */
-	private CompanyDao getCompanyObject() {
-		CompanyDao company = new CompanyDao();
-		company.setCompanyCode("abc");
-		company.setCompanyId(UUID.randomUUID().toString());
-		company.setCompanyName("ABC Company");
-		company.setCompanyCeo("Riya");
-		company.setCompanyTurnover("1000000000");
-		company.setCompanyWebsite("http://www.google.com");
-		company.setStockExchange("NSE");
-		return company;
-	}
+	
 }

@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
@@ -47,43 +46,29 @@ public class CompanyServiceImpl implements CompanyService {
 	/**
 	 * Register company.
 	 *
-	 * @param requestBody the request body
+	 * @param companyDao the company dao
 	 * @return the boolean
 	 * @throws Exception the exception
 	 */
 	@Override
-	public Integer registerCompany(String requestBody) throws Exception {
+	public Integer registerCompany(CompanyDao companyDao) throws Exception {
 		applicationLog.info("Entering registerCompany Service");
 		Integer isSuccessful = null;
-		CompanyDto companyDto = null;
-
-		try {
-			companyDto = new ObjectMapper().readValue(requestBody, CompanyDto.class);
-		} catch (JsonProcessingException e) {
-			errorLog.error("Error in mapping requestbody to company: {}", e.getMessage());
-			throw e;
-		}
-
-		CompanyDao comapanyDao = companyRepository.findByCompanyCode(companyDto.getCompanyCode());
-		if (!validateCompanyFields(companyDto)) {
-			applicationLog.info("Field Validation Failed");
-			isSuccessful = 3;
-		} else if (comapanyDao != null) {
+		
+		applicationLog.info("company: {}", new ObjectMapper().writeValueAsString(companyDao));
+		CompanyDao existingDao = companyRepository.findByCompanyCode(companyDao.getCompanyCode());
+		if (existingDao != null) {
 			applicationLog.info("Company Already Exists");
 			isSuccessful = 1;
-		} else if (Double.parseDouble(companyDto.getCompanyTurnover()) < Double.valueOf(100000000)) {
+		} else if (!validateCompanyFields(companyDao)) {
+			applicationLog.info("Field Validation Failed");
+			isSuccessful = 3;
+		} else if (Double.parseDouble(companyDao.getCompanyTurnover()) < Double.valueOf(100000000)) {
 			applicationLog.info("Company turnover must be greater than 10Cr");
 			isSuccessful = 2;
 		} else {
-			CompanyDao company = new CompanyDao();
-			company.setCompanyCode(companyDto.getCompanyCode());
-			company.setCompanyName(companyDto.getCompanyName());
-			company.setCompanyCeo(companyDto.getCompanyCeo());
-			company.setCompanyTurnover(companyDto.getCompanyTurnover());
-			company.setCompanyWebsite(companyDto.getCompanyWebsite());
-			company.setStockExchange(companyDto.getStockExchange());
 			try {
-				companyRepository.save(company);
+				companyRepository.save(companyDao);
 				isSuccessful = 0;
 			} catch (Exception e) {
 				errorLog.error("Error in saving company details to db. error: {}", e.getMessage());
@@ -219,28 +204,29 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @param company the company
 	 * @return the boolean
 	 */
-	private Boolean validateCompanyFields(CompanyDto company) {
+	private Boolean validateCompanyFields(CompanyDao company) {
 
 		try {
 			Double.parseDouble(company.getCompanyTurnover());
 		} catch (Exception e) {
+			errorLog.error("Company turnover validation failed: {}", e.getMessage());
 			return false;
 		}
 
 		try {
 			new URL(company.getCompanyWebsite());
 		} catch (MalformedURLException e) {
-			applicationLog.info("Company website is not a url: {}", e.getMessage());
+			errorLog.error("Company website is not a url: {}", e.getMessage());
 			return false;
 		}
 
-		if (stringNullAndEmptyValidation(company.getCompanyCeo())
-				&& stringNullAndEmptyValidation(company.getCompanyCode())
-				&& stringNullAndEmptyValidation(company.getCompanyName())
-				&& stringNullAndEmptyValidation(company.getCompanyTurnover())
-				&& stringNullAndEmptyValidation(company.getCompanyWebsite())
-				&& stringNullAndEmptyValidation(company.getStockExchange())) {
-			applicationLog.info("Field validation successful");
+		if (stringNullAndEmptyValidation("COMPANY_CEO", company.getCompanyCeo())
+				&& stringNullAndEmptyValidation("COMPANY_CODE", company.getCompanyCode())
+				&& stringNullAndEmptyValidation("COMPANY_NAME", company.getCompanyName())
+				&& stringNullAndEmptyValidation("COMPANY_TURNOVER", company.getCompanyTurnover())
+				&& stringNullAndEmptyValidation("COMPANY_WEBSITE", company.getCompanyWebsite())
+				&& stringNullAndEmptyValidation("STOCK_EXCHANGE", company.getStockExchange())) {
+			errorLog.error("Field validation successful");
 			return true;
 		}
 
@@ -250,14 +236,17 @@ public class CompanyServiceImpl implements CompanyService {
 	/**
 	 * String null and empty validation.
 	 *
+	 * @param name the name
 	 * @param value the value
 	 * @return the boolean
 	 */
-	private Boolean stringNullAndEmptyValidation(String value) {
+	private Boolean stringNullAndEmptyValidation(String name, String value) {
 		if (value != null && !value.isEmpty())
 			return true;
-		else
+		else {
+			errorLog.error("Field validation failed for {}", name);
 			return false;
+		}
 	}
 
 	/**

@@ -15,14 +15,17 @@ import java.util.List;
 import java.util.UUID;
 
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.stock.market.constants.CompanyConstants;
 import com.stock.market.dto.CompanyDto;
+import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
 /**
@@ -48,11 +51,11 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(0);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(0);
 		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}"))
-				.andDo(print()).andExpect(status().isOk()).andExpect(content().string(containsString("true")))
-				.andReturn();
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}")
+				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
+				.andExpect(content().string(containsString("true"))).andReturn();
 	}
 
 	/**
@@ -63,10 +66,11 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyAlreadyExistTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(1);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(1);
 		this.mockMvc
 				.perform(post("/api/v1.0/market/company/register")
-						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
+						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}")
+						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.COMPANY_ALREADY_EXIST))).andReturn();
 	}
@@ -79,10 +83,10 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyLessCompanyTurnoverTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(2);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(2);
 		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}"))
-				.andDo(print()).andExpect(status().isOk())
+				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}")
+				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.COMPANY_TURNOVER_IS_LESS))).andReturn();
 	}
 
@@ -94,10 +98,10 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyLessFieldValidationTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenReturn(3);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(3);
 		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
-				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}"))
-				.andDo(print()).andExpect(status().isOk())
+				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}")
+				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.FIELD_VALIDATION_FAILD))).andReturn();
 	}
 
@@ -109,10 +113,11 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyExceptionTest() throws Exception {
 
-		when(companyService.registerCompany(anyString())).thenThrow(Exception.class);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenThrow(Exception.class);
 		this.mockMvc
 				.perform(post("/api/v1.0/market/company/register")
-						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}"))
+						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}")
+						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print()).andExpect(status().isInternalServerError())
 				.andExpect(content().string(containsString(CompanyConstants.INTERNAL_SERVER_ERROR))).andReturn();
 	}

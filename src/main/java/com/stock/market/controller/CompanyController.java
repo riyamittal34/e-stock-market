@@ -7,24 +7,25 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.stock.market.constants.CompanyConstants;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
+import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
 /**
  * The Class CompanyController.
  */
-@Controller
+@RestController
 @RequestMapping("/api/v1.0/market/company")
 public class CompanyController {
 
@@ -41,17 +42,17 @@ public class CompanyController {
 	/**
 	 * Register company.
 	 *
-	 * @param requestBody the request body
+	 * @param companyDao the company dao
 	 * @return the response entity
 	 */
 	@PostMapping(value = "/register")
-	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody String requestBody) {
+	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody CompanyDao companyDao) {
 		applicationLog.info("Entering registerCompany Controller");
 		Integer isSuccessful = null;
 		CompanyResponse<Boolean> response = new CompanyResponse<Boolean>();
 		ResponseMessage message = new ResponseMessage();
 		try {
-			isSuccessful = companyService.registerCompany(requestBody);
+			isSuccessful = companyService.registerCompany(companyDao);
 			if (isSuccessful == 2) {
 				message.setCode(CompanyConstants.COMPANY_TURNOVER_IS_LESS);
 				message.setDescription("Company turnover should be greater than 10Cr");
