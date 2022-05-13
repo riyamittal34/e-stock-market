@@ -44,7 +44,7 @@ class HomeControllerTest {
 	 */
 	@Test
 	public void testGetSwaggerStatus() throws Exception {
-		mockMvc.perform(get("/company/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk())
+		mockMvc.perform(get("/").contentType(MediaType.APPLICATION_JSON)).andExpect(status().is3xxRedirection())
 				.andReturn();
 	}
 

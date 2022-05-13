@@ -84,10 +84,10 @@ class CompanyServiceTest {
 	@Test
 	void registerCompanyTest() throws Exception {
 
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDto company = MockSample.getCompanyObject();
 
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
-		when(companyRepository.save(any(CompanyDao.class))).thenReturn(company);
+		when(companyRepository.save(any(CompanyDao.class))).thenReturn(new CompanyDao());
 		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(0, isSuccessful);
 	}
@@ -100,8 +100,8 @@ class CompanyServiceTest {
 	@Test
 	void registerCompanyAlreadyExistTest() throws Exception {
 
-		CompanyDao company = MockSample.getCompanyObject();
-		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
+		CompanyDto company = MockSample.getCompanyObject();
+		when(companyRepository.findByCompanyCode("abc")).thenReturn(new CompanyDao());
 		Integer isSuccessful = companyService.registerCompany(company);
 		assertEquals(1, isSuccessful);
 	}
@@ -113,7 +113,7 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyLessTurnoverTest() throws Exception {
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDto company = MockSample.getCompanyObject();
 		company.setCompanyTurnover("3434");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(company);
@@ -127,7 +127,7 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyFieldValidationFailedTest() throws Exception {
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDto company = MockSample.getCompanyObject();
 		company.setCompanyCeo("");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(company);
@@ -141,7 +141,7 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyMalformedURLTest() throws Exception {
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDto company = MockSample.getCompanyObject();
 		company.setCompanyWebsite("url");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(company);
@@ -155,7 +155,7 @@ class CompanyServiceTest {
 	 */
 	@Test
 	void registerCompanyTurnoverFieldDatatypeMismatchTest() throws Exception {
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDto company = MockSample.getCompanyObject();
 		company.setCompanyTurnover("30Cr");
 		when(companyRepository.findByCompanyCode("ghi")).thenReturn(null);
 		Integer isSuccessful = companyService.registerCompany(company);
@@ -186,7 +186,7 @@ class CompanyServiceTest {
 	@Test
 	void getCompanyByCompanyCodeTest() throws Exception {
 
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDao company = MockSample.getCompanyDaoObject();
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
 
@@ -211,7 +211,7 @@ class CompanyServiceTest {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
 	void getCompanyByCompanyCodeStockPriceTest() throws Exception {
-		CompanyDao company = MockSample.getCompanyObject();
+		CompanyDao company = MockSample.getCompanyDaoObject();
 
 		CompanyResponse<Double> response = new CompanyResponse<>();
 		response.withData(200.0);
@@ -247,7 +247,7 @@ class CompanyServiceTest {
 	void getAllCompanyDetailsTest() throws Exception {
 
 		List<CompanyDao> mockCompanies = new ArrayList<CompanyDao>();
-		mockCompanies.add(MockSample.getCompanyObject());
+		mockCompanies.add(MockSample.getCompanyDaoObject());
 
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
@@ -273,7 +273,7 @@ class CompanyServiceTest {
 		List<InstanceInfo> instances = new ArrayList<>();
 		instances.add(instance);
 
-		when(companyRepository.findByCompanyCode("abc")).thenReturn(MockSample.getCompanyObject());
+		when(companyRepository.findByCompanyCode("abc")).thenReturn(MockSample.getCompanyDaoObject());
 		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
 		when(application.getInstances()).thenReturn(instances);
 		when(instance.getHostName()).thenReturn("");

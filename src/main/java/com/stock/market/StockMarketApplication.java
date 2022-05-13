@@ -26,14 +26,15 @@ public class StockMarketApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(StockMarketApplication.class, args);
 	}
-	
-	 @Bean
-	  public GroupedOpenApi api()
-	  {
-	      return GroupedOpenApi.builder()
-	              .group("CompanyController")
-	              .packagesToScan("com.stock.market")
-	              .build();
-	  }
+
+	/**
+	 * Api.
+	 *
+	 * @return the grouped open api
+	 */
+	@Bean
+	public GroupedOpenApi api() {
+		return GroupedOpenApi.builder().group("CompanyController").packagesToScan("com.stock.market").build();
+	}
 
 }

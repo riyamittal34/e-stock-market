@@ -12,21 +12,18 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.stock.market.constants.CompanyConstants;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
-import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
 /**
  * The Class CompanyController.
  */
 @RestController
-@RequestMapping("/api/v1.0/market/company")
 public class CompanyController {
 
 	/** The application log. */
@@ -42,17 +39,17 @@ public class CompanyController {
 	/**
 	 * Register company.
 	 *
-	 * @param companyDao the company dao
+	 * @param companyDto the company dto
 	 * @return the response entity
 	 */
 	@PostMapping(value = "/register")
-	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody CompanyDao companyDao) {
+	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody CompanyDto companyDto) {
 		applicationLog.info("Entering registerCompany Controller");
 		Integer isSuccessful = null;
 		CompanyResponse<Boolean> response = new CompanyResponse<Boolean>();
 		ResponseMessage message = new ResponseMessage();
 		try {
-			isSuccessful = companyService.registerCompany(companyDao);
+			isSuccessful = companyService.registerCompany(companyDto);
 			if (isSuccessful == 2) {
 				message.setCode(CompanyConstants.COMPANY_TURNOVER_IS_LESS);
 				message.setDescription("Company turnover should be greater than 10Cr");

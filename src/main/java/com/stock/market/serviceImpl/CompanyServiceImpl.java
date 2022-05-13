@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
 import com.stock.market.dto.CompanyDto;
@@ -46,28 +45,35 @@ public class CompanyServiceImpl implements CompanyService {
 	/**
 	 * Register company.
 	 *
-	 * @param companyDao the company dao
+	 * @param companyDto the company dto
 	 * @return the boolean
 	 * @throws Exception the exception
 	 */
 	@Override
-	public Integer registerCompany(CompanyDao companyDao) throws Exception {
+	public Integer registerCompany(CompanyDto companyDto) throws Exception {
 		applicationLog.info("Entering registerCompany Service");
 		Integer isSuccessful = null;
 		
-		applicationLog.info("company: {}", new ObjectMapper().writeValueAsString(companyDao));
-		CompanyDao existingDao = companyRepository.findByCompanyCode(companyDao.getCompanyCode());
+		CompanyDao existingDao = companyRepository.findByCompanyCode(companyDto.getCompanyCode());
 		if (existingDao != null) {
 			applicationLog.info("Company Already Exists");
 			isSuccessful = 1;
-		} else if (!validateCompanyFields(companyDao)) {
+		} else if (!validateCompanyFields(companyDto)) {
 			applicationLog.info("Field Validation Failed");
 			isSuccessful = 3;
-		} else if (Double.parseDouble(companyDao.getCompanyTurnover()) < Double.valueOf(100000000)) {
+		} else if (Double.parseDouble(companyDto.getCompanyTurnover()) < Double.valueOf(100000000)) {
 			applicationLog.info("Company turnover must be greater than 10Cr");
 			isSuccessful = 2;
 		} else {
 			try {
+				CompanyDao companyDao = new CompanyDao();
+				companyDao.setCompanyCeo(companyDto.getCompanyCeo());
+				companyDao.setCompanyCode(companyDto.getCompanyCode());
+				companyDao.setCompanyName(companyDto.getCompanyName());
+				companyDao.setCompanyTurnover(companyDto.getCompanyTurnover());
+				companyDao.setCompanyWebsite(companyDto.getCompanyWebsite());
+				companyDao.setStockExchange(companyDto.getStockExchange());
+				
 				companyRepository.save(companyDao);
 				isSuccessful = 0;
 			} catch (Exception e) {
@@ -204,7 +210,7 @@ public class CompanyServiceImpl implements CompanyService {
 	 * @param company the company
 	 * @return the boolean
 	 */
-	private Boolean validateCompanyFields(CompanyDao company) {
+	private Boolean validateCompanyFields(CompanyDto company) {
 
 		try {
 			Double.parseDouble(company.getCompanyTurnover());

@@ -25,7 +25,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import com.stock.market.constants.CompanyConstants;
 import com.stock.market.dto.CompanyDto;
-import com.stock.market.entity.CompanyDao;
 import com.stock.market.service.CompanyService;
 
 /**
@@ -51,8 +50,8 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyTest() throws Exception {
 
-		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(0);
-		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDto.class))).thenReturn(0);
+		this.mockMvc.perform(post("/register").content(
 				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000000000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}")
 				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString("true"))).andReturn();
@@ -66,9 +65,9 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyAlreadyExistTest() throws Exception {
 
-		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(1);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDto.class))).thenReturn(1);
 		this.mockMvc
-				.perform(post("/api/v1.0/market/company/register")
+				.perform(post("/register")
 						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}")
 						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print()).andExpect(status().isOk())
@@ -83,8 +82,8 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyLessCompanyTurnoverTest() throws Exception {
 
-		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(2);
-		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDto.class))).thenReturn(2);
+		this.mockMvc.perform(post("/register").content(
 				"{\"companyCode\": \"ghi\", \"companyName\": \"GHI Company\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}")
 				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.COMPANY_TURNOVER_IS_LESS))).andReturn();
@@ -98,8 +97,8 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyLessFieldValidationTest() throws Exception {
 
-		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenReturn(3);
-		this.mockMvc.perform(post("/api/v1.0/market/company/register").content(
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDto.class))).thenReturn(3);
+		this.mockMvc.perform(post("/register").content(
 				"{\"companyCode\": \"ghi\", \"companyName\": \"\", \"companyTurnover\": \"20000\", \"companyCeo\": \"Riya Mittal\", \"companyWebsite\": \"http://www.google.com\", \"stockExchange\": \"NSE\"}")
 				.contentType(MediaType.APPLICATION_JSON)).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.FIELD_VALIDATION_FAILD))).andReturn();
@@ -113,9 +112,9 @@ class CompanyControllerTest {
 	@Test
 	void registerCompanyExceptionTest() throws Exception {
 
-		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDao.class))).thenThrow(Exception.class);
+		when(companyService.registerCompany(ArgumentMatchers.any(CompanyDto.class))).thenThrow(Exception.class);
 		this.mockMvc
-				.perform(post("/api/v1.0/market/company/register")
+				.perform(post("/register")
 						.content("{\"companyCode\": \"abc\", \"companyName\": \"ABC Company\"}")
 						.contentType(MediaType.APPLICATION_JSON))
 				.andDo(print()).andExpect(status().isInternalServerError())
@@ -138,7 +137,7 @@ class CompanyControllerTest {
 
 		when(companyService.getCompanyByCompanyCode("abc")).thenReturn(company);
 
-		this.mockMvc.perform(get("/api/v1.0/market/company/info/abc")).andDo(print()).andExpect(status().isOk())
+		this.mockMvc.perform(get("/info/abc")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.COMPANY_FOUND))).andReturn();
 	}
 
@@ -153,7 +152,7 @@ class CompanyControllerTest {
 
 		when(companyService.getCompanyByCompanyCode("abc")).thenReturn(null);
 
-		this.mockMvc.perform(get("/api/v1.0/market/company/info/abc")).andDo(print()).andExpect(status().isNotFound())
+		this.mockMvc.perform(get("/info/abc")).andDo(print()).andExpect(status().isNotFound())
 				.andExpect(content().string(containsString(CompanyConstants.COMPANY_NOT_FOUND))).andReturn();
 	}
 
@@ -168,7 +167,7 @@ class CompanyControllerTest {
 
 		when(companyService.getCompanyByCompanyCode("abc")).thenThrow(Exception.class);
 
-		this.mockMvc.perform(get("/api/v1.0/market/company/info/abc")).andDo(print())
+		this.mockMvc.perform(get("/info/abc")).andDo(print())
 				.andExpect(status().isInternalServerError())
 				.andExpect(content().string(containsString(CompanyConstants.INTERNAL_SERVER_ERROR))).andReturn();
 	}
@@ -191,7 +190,7 @@ class CompanyControllerTest {
 
 		when(companyService.getAllCompanyDetails()).thenReturn(companies);
 
-		this.mockMvc.perform(get("/api/v1.0/market/company/getall")).andDo(print()).andExpect(status().isOk())
+		this.mockMvc.perform(get("/getall")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.DATA_FETCH_SUCCESS))).andReturn();
 	}
 
@@ -207,7 +206,7 @@ class CompanyControllerTest {
 		List<CompanyDto> companies = new ArrayList<CompanyDto>();
 		when(companyService.getAllCompanyDetails()).thenReturn(companies);
 
-		this.mockMvc.perform(get("/api/v1.0/market/company/getall")).andDo(print()).andExpect(status().isNotFound())
+		this.mockMvc.perform(get("/getall")).andDo(print()).andExpect(status().isNotFound())
 				.andExpect(content().string(containsString(CompanyConstants.NO_COMPANY_FOUND))).andReturn();
 	}
 
@@ -221,7 +220,7 @@ class CompanyControllerTest {
 	void getAllCompanyDetailsExceptionTest() throws Exception {
 		when(companyService.getAllCompanyDetails()).thenThrow(Exception.class);
 
-		this.mockMvc.perform(get("/api/v1.0/market/company/getall")).andDo(print())
+		this.mockMvc.perform(get("/getall")).andDo(print())
 				.andExpect(status().isInternalServerError())
 				.andExpect(content().string(containsString(CompanyConstants.INTERNAL_SERVER_ERROR))).andReturn();
 	}
@@ -236,7 +235,7 @@ class CompanyControllerTest {
 
 		when(companyService.deleteCompanyByCompanyCode(anyString())).thenReturn(true);
 
-		this.mockMvc.perform(delete("/api/v1.0/market/company/delete/abc")).andDo(print()).andExpect(status().isOk())
+		this.mockMvc.perform(delete("/delete/abc")).andDo(print()).andExpect(status().isOk())
 				.andExpect(content().string(containsString(CompanyConstants.COMPANY_DELETED))).andReturn();
 	}
 
@@ -250,7 +249,7 @@ class CompanyControllerTest {
 
 		when(companyService.deleteCompanyByCompanyCode(anyString())).thenThrow(Exception.class);
 
-		this.mockMvc.perform(delete("/api/v1.0/market/company/delete/abc")).andDo(print())
+		this.mockMvc.perform(delete("/delete/abc")).andDo(print())
 				.andExpect(status().isInternalServerError())
 				.andExpect(content().string(containsString(CompanyConstants.INTERNAL_SERVER_ERROR))).andReturn();
 	}
