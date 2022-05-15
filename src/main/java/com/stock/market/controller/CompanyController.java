@@ -20,6 +20,9 @@ import com.stock.market.dto.CompanyResponse;
 import com.stock.market.dto.ResponseMessage;
 import com.stock.market.service.CompanyService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
 /**
  * The Class CompanyController.
  */
@@ -43,6 +46,7 @@ public class CompanyController {
 	 * @return the response entity
 	 */
 	@PostMapping(value = "/register")
+	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<CompanyResponse<Boolean>> registerCompany(@RequestBody CompanyDto companyDto) {
 		applicationLog.info("Entering registerCompany Controller");
 		Integer isSuccessful = null;
@@ -88,6 +92,7 @@ public class CompanyController {
 	 * @return the company by company code
 	 */
 	@GetMapping(value = "/info/{companycode}")
+	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<CompanyResponse<CompanyDto>> getCompanyByCompanyCode(
 			@PathVariable("companycode") String companyCode) {
 		applicationLog.info("Entering getCompanyByCompanyCode Controller");
@@ -128,6 +133,7 @@ public class CompanyController {
 	 * @return the all company details
 	 */
 	@GetMapping(value = "/getall")
+	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<CompanyResponse<List<CompanyDto>>> getAllCompanyDetails() {
 		applicationLog.info("Entering getAllCompanyDetails Controller");
 		CompanyResponse<List<CompanyDto>> response = new CompanyResponse<>();
@@ -168,6 +174,7 @@ public class CompanyController {
 	 * @return the response entity
 	 */
 	@DeleteMapping(value = "/delete/{companycode}")
+	@Operation(security = @SecurityRequirement(name = "bearerAuth"))
 	public ResponseEntity<CompanyResponse<Boolean>> deleteCompanyByCompanyCode(
 			@PathVariable("companycode") String companyCode) {
 		applicationLog.info("Entering deleteCompanyByCompanyCode Controller");
