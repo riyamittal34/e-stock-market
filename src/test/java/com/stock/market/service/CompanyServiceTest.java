@@ -19,6 +19,8 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -226,10 +228,10 @@ class CompanyServiceTest {
 		when(companyRepository.findByCompanyCode("abc")).thenReturn(company);
 		when(eurekaClient.getApplication(ArgumentMatchers.anyString())).thenReturn(application);
 		when(application.getInstances()).thenReturn(instances);
-		when(instance.getHostName()).thenReturn("");
-		when(instance.getPort()).thenReturn(0);
-		when(restTemplate.getForEntity(ArgumentMatchers.anyString(), ArgumentMatchers.any(Class.class)))
-				.thenReturn(entity);
+		when(instance.getHostName()).thenReturn("localhost");
+		when(instance.getPort()).thenReturn(8080);
+		when(restTemplate.exchange(ArgumentMatchers.anyString(), ArgumentMatchers.any(HttpMethod.class),
+				ArgumentMatchers.any(HttpEntity.class), ArgumentMatchers.any(Class.class))).thenReturn(entity);
 		CompanyDto companyDto = companyService.getCompanyByCompanyCode("abc");
 
 		assertEquals(company.getCompanyCode(), companyDto.getCompanyCode());
@@ -282,5 +284,5 @@ class CompanyServiceTest {
 
 		assertTrue(isSuccess);
 	}
-	
+
 }

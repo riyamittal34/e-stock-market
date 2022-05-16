@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,7 @@ import org.springframework.web.client.RestTemplate;
 
 import com.netflix.appinfo.InstanceInfo;
 import com.netflix.discovery.EurekaClient;
+import com.stock.market.constants.CompanyConstants;
 import com.stock.market.dto.CompanyDto;
 import com.stock.market.dto.CompanyDtoBuilder;
 import com.stock.market.dto.CompanyResponse;
@@ -47,6 +49,9 @@ public class CompanyServiceImpl implements CompanyService {
 	/** The eureka client. */
 	@Autowired
 	EurekaClient eurekaClient;
+	
+	@Value("{auth.user.pass}")
+	String pass;
 
 	/**
 	 * Register company.
@@ -114,11 +119,12 @@ public class CompanyServiceImpl implements CompanyService {
 		InstanceInfo instance = getStockServiceInstance();
 		String url = "http://" + instance.getHostName() + ":" + instance.getPort()
 				+ "/api/v1.0/market/stock/get/stockPrice/";
-		
+
 		HttpEntity<String> entity = getAuthToken();
 		ResponseEntity<CompanyResponse> response = null;
 		try {
-			response = restTemplate.exchange(url + company.getCompanyCode(), HttpMethod.GET, entity, CompanyResponse.class);
+			response = restTemplate.exchange(url + company.getCompanyCode(), HttpMethod.GET, entity,
+					CompanyResponse.class);
 			if (response.getStatusCode().is2xxSuccessful()) {
 				CompanyResponse<Double> companyResponse = response.getBody();
 				if (null != companyResponse
@@ -161,7 +167,8 @@ public class CompanyServiceImpl implements CompanyService {
 			applicationLog.info("Connecting to : {}", (url + company.getCompanyCode()));
 			ResponseEntity<CompanyResponse> response = null;
 			try {
-				response = restTemplate.exchange(url + company.getCompanyCode(), HttpMethod.GET, entity, CompanyResponse.class);
+				response = restTemplate.exchange(url + company.getCompanyCode(), HttpMethod.GET, entity,
+						CompanyResponse.class);
 				if (response.getStatusCode().is2xxSuccessful()) {
 					CompanyResponse<Double> companyResponse = response.getBody();
 					if (null != companyResponse
@@ -199,7 +206,7 @@ public class CompanyServiceImpl implements CompanyService {
 		RestTemplate restTemplate = new RestTemplate();
 		InstanceInfo instance = getStockServiceInstance();
 		String url = "http://" + instance.getHostName() + ":" + instance.getPort() + "/api/v1.0/market/stock/delete/";
-		
+
 		HttpEntity<String> entity = getAuthToken();
 		ResponseEntity<CompanyResponse> response = null;
 		try {
@@ -303,14 +310,15 @@ public class CompanyServiceImpl implements CompanyService {
 
 		MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
 		body.add("username", "riya");
-		body.add("password", "riya@123");
+		body.add(CompanyConstants.STOCK_PW, pass);
 		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(body, header);
 		try {
 			ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
 			Map<String, String> responseBody = (Map<String, String>) response.getBody();
-			token = responseBody.get("access_token");
+			if (responseBody != null)
+				token = responseBody.get("access_token");
 		} catch (Exception e) {
-			e.printStackTrace();
+			errorLog.error("Error in fetching token");
 		}
 		
 		HttpHeaders headers = new HttpHeaders();
@@ -318,4 +326,5 @@ public class CompanyServiceImpl implements CompanyService {
 		HttpEntity<String> getEntity = new HttpEntity<>(headers);
 		return getEntity;
 	}
+
 }

@@ -18,4 +18,6 @@ public class CompanyConstants {
 	public static final String EXITING_ALL_COMPANY_CONTROLLER = "Exiting getAllCompanyDetails Controller";
 	public static final String EXITING_DELETE_COMPANY_BY_CODE_CONTROLLER = "Exiting deleteCompanyByCompanyCode Controller";
 	
+	public static final String STOCK_PW = "password";
+	public static final String PASS_VALUE = "riya@123";
 }
