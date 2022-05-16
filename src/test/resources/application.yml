@@ -19,4 +19,4 @@ logging:
     name: C:\Users\User\Desktop\Gi_Workspace\logs\company.log
   level:
     root: INFO
-    org.package: INFO
+    org.package: INFOs

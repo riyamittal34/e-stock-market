@@ -14,8 +14,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stock.market.dto.RoleDto;
 import com.stock.market.dto.UserDto;
 import com.stock.market.entity.RoleDao;
@@ -42,8 +40,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	public UserDao addUser(UserDto user) {
 		UserDao userDao = new UserDao();
 		userDao.setName(user.getName());
-		userDao.setPassword(passwordEncoder.encode(user.getPassword()));
 		userDao.setUsername(user.getUsername());
+		userDao.setPassword(passwordEncoder.encode(user.getPassword()));
 		return userRepository.save(userDao);
 	}
 
@@ -83,7 +81,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			applicationLog.error("User not found in database");
 			throw new UsernameNotFoundException("User not found in database");
 		} else {
-			applicationLog.info("User found in database: {}", passwordEncoder.encode("john@123"));
+			applicationLog.info("User found in database");
 		}
 		List<SimpleGrantedAuthority> authorities = new ArrayList<>();
 		user.getRoles().forEach(role -> {
