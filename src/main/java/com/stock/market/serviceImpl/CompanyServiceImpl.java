@@ -4,13 +4,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import com.netflix.appinfo.InstanceInfo;
@@ -53,7 +59,7 @@ public class CompanyServiceImpl implements CompanyService {
 	public Integer registerCompany(CompanyDto companyDto) throws Exception {
 		applicationLog.info("Entering registerCompany Service");
 		Integer isSuccessful = null;
-		
+
 		CompanyDao existingDao = companyRepository.findByCompanyCode(companyDto.getCompanyCode());
 		if (existingDao != null) {
 			applicationLog.info("Company Already Exists");
@@ -73,7 +79,7 @@ public class CompanyServiceImpl implements CompanyService {
 				companyDao.setCompanyTurnover(companyDto.getCompanyTurnover());
 				companyDao.setCompanyWebsite(companyDto.getCompanyWebsite());
 				companyDao.setStockExchange(companyDto.getStockExchange());
-				
+
 				companyRepository.save(companyDao);
 				isSuccessful = 0;
 			} catch (Exception e) {
@@ -108,12 +114,15 @@ public class CompanyServiceImpl implements CompanyService {
 		InstanceInfo instance = getStockServiceInstance();
 		String url = "http://" + instance.getHostName() + ":" + instance.getPort()
 				+ "/api/v1.0/market/stock/get/stockPrice/";
+		
+		HttpEntity<String> entity = getAuthToken();
 		ResponseEntity<CompanyResponse> response = null;
 		try {
-			response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
+			response = restTemplate.exchange(url + company.getCompanyCode(), HttpMethod.GET, entity, CompanyResponse.class);
 			if (response.getStatusCode().is2xxSuccessful()) {
 				CompanyResponse<Double> companyResponse = response.getBody();
-				if (null != companyResponse && companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
+				if (null != companyResponse
+						&& companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
 					companyDto.setLatestStockPrice(companyResponse.getData());
 				}
 			}
@@ -143,6 +152,7 @@ public class CompanyServiceImpl implements CompanyService {
 		InstanceInfo instance = getStockServiceInstance();
 		String url = "http://" + instance.getHostName() + ":" + instance.getPort()
 				+ "/api/v1.0/market/stock/get/stockPrice/";
+		HttpEntity<String> entity = getAuthToken();
 
 		List<CompanyDto> companyDtos = new ArrayList<CompanyDto>();
 		for (CompanyDao company : companies) {
@@ -151,10 +161,11 @@ public class CompanyServiceImpl implements CompanyService {
 			applicationLog.info("Connecting to : {}", (url + company.getCompanyCode()));
 			ResponseEntity<CompanyResponse> response = null;
 			try {
-				response = restTemplate.getForEntity(url + company.getCompanyCode(), CompanyResponse.class);
+				response = restTemplate.exchange(url + company.getCompanyCode(), HttpMethod.GET, entity, CompanyResponse.class);
 				if (response.getStatusCode().is2xxSuccessful()) {
 					CompanyResponse<Double> companyResponse = response.getBody();
-					if (null != companyResponse && companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
+					if (null != companyResponse
+							&& companyResponse.getMessage().getCode().equals("LATEST_STOCK_PRICE_FETCHED")) {
 						companyDto.setLatestStockPrice(companyResponse.getData());
 					}
 				}
@@ -188,10 +199,11 @@ public class CompanyServiceImpl implements CompanyService {
 		RestTemplate restTemplate = new RestTemplate();
 		InstanceInfo instance = getStockServiceInstance();
 		String url = "http://" + instance.getHostName() + ":" + instance.getPort() + "/api/v1.0/market/stock/delete/";
-
+		
+		HttpEntity<String> entity = getAuthToken();
 		ResponseEntity<CompanyResponse> response = null;
 		try {
-			response = restTemplate.exchange(url + companyCode, HttpMethod.DELETE, null, CompanyResponse.class);
+			response = restTemplate.exchange(url + companyCode, HttpMethod.DELETE, entity, CompanyResponse.class);
 			if (response.getStatusCode().is2xxSuccessful()) {
 				applicationLog.info("Stocks deleted for company with companycode: {}", company.getCompanyCode());
 			}
@@ -242,7 +254,7 @@ public class CompanyServiceImpl implements CompanyService {
 	/**
 	 * String null and empty validation.
 	 *
-	 * @param name the name
+	 * @param name  the name
 	 * @param value the value
 	 * @return the boolean
 	 */
@@ -278,5 +290,32 @@ public class CompanyServiceImpl implements CompanyService {
 		List<InstanceInfo> instances = eurekaClient.getApplication("stock-service").getInstances();
 		InstanceInfo instance = instances.get(0);
 		return instance;
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	private HttpEntity<String> getAuthToken() {
+		String token = null;
+		RestTemplate restTemplate = new RestTemplate();
+		InstanceInfo instance = getStockServiceInstance();
+		String url = "http://" + instance.getHostName() + ":" + instance.getPort() + "/api/v1.0/market/stock/login";
+		HttpHeaders header = new HttpHeaders();
+		header.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		MultiValueMap<String, String> body = new LinkedMultiValueMap<String, String>();
+		body.add("username", "riya");
+		body.add("password", "riya@123");
+		HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<MultiValueMap<String, String>>(body, header);
+		try {
+			ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.POST, entity, Map.class);
+			Map<String, String> responseBody = (Map<String, String>) response.getBody();
+			token = responseBody.get("access_token");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		HttpHeaders headers = new HttpHeaders();
+		headers.add("Authorization", "Bearer " + token);
+		HttpEntity<String> getEntity = new HttpEntity<>(headers);
+		return getEntity;
 	}
 }
