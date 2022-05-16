@@ -50,7 +50,7 @@ public class CompanyServiceImpl implements CompanyService {
 	@Autowired
 	EurekaClient eurekaClient;
 	
-	@Value("{auth.user.pass}")
+	@Value("${auth.user.pass}")
 	String pass;
 
 	/**
@@ -318,7 +318,7 @@ public class CompanyServiceImpl implements CompanyService {
 			if (responseBody != null)
 				token = responseBody.get("access_token");
 		} catch (Exception e) {
-			errorLog.error("Error in fetching token");
+			errorLog.error("Error in fetching token: {}", pass);
 		}
 		
 		HttpHeaders headers = new HttpHeaders();
