@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.GetMapping;
  * The Class HomeController.
  */
 @Controller
-//@RequestMapping("/company")
 public class HomeController {
 
 	/**

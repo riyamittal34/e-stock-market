@@ -30,7 +30,7 @@ import com.stock.market.service.UserService;
 import com.stock.market.util.MockSample;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class UserControllerTest {
 
 	/** The mock mvc. */

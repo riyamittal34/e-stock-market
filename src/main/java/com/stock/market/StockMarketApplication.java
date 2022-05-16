@@ -14,7 +14,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @SpringBootApplication
 @EnableMongoRepositories
 @EnableEurekaClient
-//@OpenAPIDefinition
 public class StockMarketApplication {
 
 	/**

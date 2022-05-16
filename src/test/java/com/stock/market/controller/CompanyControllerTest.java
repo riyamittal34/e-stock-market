@@ -32,7 +32,7 @@ import com.stock.market.service.CompanyService;
  * The Class CompanyControllerTest.
  */
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 class CompanyControllerTest {
 
 	/** The mock mvc. */

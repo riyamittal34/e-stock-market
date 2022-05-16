@@ -33,7 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http.csrf().disable();
+//		http.csrf().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 		http.authorizeRequests().antMatchers("/").permitAll();
 		http.authorizeRequests().antMatchers("/login/**").permitAll();
@@ -41,10 +41,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 		http.authorizeRequests().antMatchers("/v3/api-docs/**").permitAll();
 		http.authorizeRequests().antMatchers("/swagger-ui/**").permitAll();
 		http.authorizeRequests().antMatchers("/user/**").hasAnyAuthority("ROLE_ADMIN");
-//		http.authorizeRequests().antMatchers("/register/**").hasAnyAuthority("USER");
-//		http.authorizeRequests().antMatchers("/info/**").hasAnyAuthority("USER");
-//		http.authorizeRequests().antMatchers("/getall/**").hasAnyAuthority("USER");
-//		http.authorizeRequests().antMatchers("/delete/**").hasAnyAuthority("USER");
 		http.authorizeRequests().antMatchers("/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN");
 		http.authorizeRequests().anyRequest().authenticated();
 		http.addFilter(new CustomAuthenticationFilter(authenticationManagerBean()));
