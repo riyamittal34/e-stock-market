@@ -27,7 +27,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
  * The Class CompanyController.
  */
 @RestController
-//@CrossOrigin
 public class CompanyController {
 
 	/** The application log. */
