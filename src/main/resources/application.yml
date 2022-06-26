@@ -1,1 +1,23 @@
-spring:  application:    name: company-service  config:    import: optional:configserver:http://localhost:8888/ server:  servlet:    context-path: /api/v1.0/market/company    management:  endpoints:    web:      exposure:        include: "health,info,metrics"        exclude:         logging:   file:     name: C:\Users\User\Desktop\Gi_Workspace\logs\company.log  level:    root: INFO    org.package: INFO
+spring:
+  application:
+    name: company-service
+  config:
+    import: optional:configserver:http://e-stock-market.us-west-2.elasticbeanstalk.com/ 
+
+server:
+  servlet:
+    context-path: /api/v1.0/market/company
+    
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "health,info,metrics"
+        exclude: 
+        
+logging: 
+  file: 
+    name: logs\company.log
+  level:
+    root: INFO
+    org.package: INFO
